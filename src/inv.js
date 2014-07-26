@@ -1,16 +1,16 @@
-var EVE-Oj = EVE-Oj || {};
+var EVEoj = EVEoj || {};
 
-EVE-Oj.inv = EVE-Oj.inv || {};
+EVEoj.inv = EVEoj.inv || {};
 (function ($) {
-	var E = EVE-Oj;
-    var ME = EVE-Oj.inv;
+	var E = EVEoj;
+    var ME = EVEoj.inv;
 })(jQuery);
 
-EVE-Oj.inv.item = EVE-Oj.inv.item || {};
+EVEoj.inv.item = EVEoj.inv.item || {};
 (function ($) {
-	var E = EVE-Oj;
-	var I = EVE-Oj.inv;
-    var ME = EVE-Oj.inv.item;
+	var E = EVEoj;
+	var I = EVEoj.inv;
+    var ME = EVEoj.inv.item;
 	
 	ME.ID = null;
 	ME.groupID = null;

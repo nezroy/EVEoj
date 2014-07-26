@@ -1,9 +1,9 @@
-var EVE-Oj = EVE-Oj || {};
+var EVEoj = EVEoj || {};
 
-EVE-Oj.dogma = EVE-Oj.dogma || {};
+EVEoj.dogma = EVEoj.dogma || {};
 (function ($) {
-	var E = EVE-Oj;
-    var ME = EVE-Oj.dogma;
+	var E = EVEoj;
+    var ME = EVEoj.dogma;
 	
 	ME.A_name = "n";
 	ME.A_bonus = "b";
@@ -17,11 +17,11 @@ EVE-Oj.dogma = EVE-Oj.dogma || {};
 	
 })(jQuery);
 
-EVE-Oj.dogma.pilot = EVE-Oj.dogma.pilot || {};
+EVEoj.dogma.pilot = EVEoj.dogma.pilot || {};
 (function ($) {
-	var E = EVE-Oj;
-	var G = EVE-Oj.dogma;
-    var ME = EVE-Oj.dogma.pilot;
+	var E = EVEoj;
+	var G = EVEoj.dogma;
+    var ME = EVEoj.dogma.pilot;
 	
 	ME.name = "no skills";
 	ME.skills = {};
@@ -42,11 +42,11 @@ EVE-Oj.dogma.pilot = EVE-Oj.dogma.pilot || {};
 	};
 })(jQuery);
 
-EVE-Oj.dogma.ship = EVE-Oj.dogma.ship || Object.create(EVE-Oj.inv.item);
+EVEoj.dogma.ship = EVEoj.dogma.ship || Object.create(EVEoj.inv.item);
 (function ($) {
-	var E = EVE-Oj;
-	var G = EVE-Oj.dogma;
-    var ME = EVE-Oj.dogma.ship;
+	var E = EVEoj;
+	var G = EVEoj.dogma;
+    var ME = EVEoj.dogma.ship;
 	
 	ME.agility = 1.0;
 	ME.maxVelocity = 200;

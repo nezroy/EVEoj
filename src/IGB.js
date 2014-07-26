@@ -1,8 +1,8 @@
-var EVE-Oj = EVE-Oj || {};
-EVE-Oj.IGB = EVE-Oj.IGB || {};
+var EVEoj = EVEoj || {};
+EVEoj.IGB = EVEoj.IGB || {};
 (function ($) {
-	var ME = EVE-Oj.IGB,
-		E = EVE-Oj, 
+	var ME = EVEoj.IGB,
+		E = EVEoj, 
 		
 		/* private functions */
 		_IGBClick, // basic click handler for IGB scheme

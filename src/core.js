@@ -12,9 +12,9 @@ if (typeof Object.create != 'function') {
     })();
 }
 
-var EVE-Oj = EVE-Oj || {};
+var EVEoj = EVEoj || {};
 (function ($) {
-    var ME = EVE-Oj;
+    var ME = EVEoj;
 	
 	ME.MPLY = 9.4605284e+15; // meters per lightyear
 	ME.MPAU = 1; // meters per AU
@@ -56,36 +56,36 @@ var EVE-Oj = EVE-Oj || {};
 	};	
 })(jQuery);
 
-EVE-Oj.data = EVE-Oj.data || {};
+EVEoj.data = EVEoj.data || {};
 (function ($) {
-	var ME = EVE-Oj.data,
-		E = EVE-Oj
+	var ME = EVEoj.data,
+		E = EVEoj
 		;
 	
 	ME.NOT_LOADED = {'not_loaded': 'unique object id'};
 	ME.NOT_FOUND = {'not_found': 'unique object id'};
 	
 	// create a new data source of the type specified with the config provided;
-	// EVE-Oj.data.src_<type> handles the actual implementation details
+	// EVEoj.data.src_<type> handles the actual implementation details
 	ME.Create = function(type, config, ctx) {
 		var p = $.Deferred();
-		if (typeof EVE-Oj.data['src_' + type] == 'undefined') {
+		if (typeof EVEoj.data['src_' + type] == 'undefined') {
 			p.rejectWith(null, [null, 'error', 'unrecognized source type']);
 			return p.promise();
 		}
-		Object.create(EVE-Oj.data['src_' + type]).SetConfig(p, config, ctx);
+		Object.create(EVEoj.data['src_' + type]).SetConfig(p, config, ctx);
 		return p.promise();
 	};
 	
 })(jQuery);
 
-EVE-Oj.data.Table = EVE-Oj.data.Table || {};
+EVEoj.data.Table = EVEoj.data.Table || {};
 (function ($) {
-    var ME = EVE-Oj.data.Table,
-		E = EVE-Oj,
-		D = EVE-Oj.data,
+    var ME = EVEoj.data.Table,
+		E = EVEoj,
+		D = EVEoj.data,
 		_D = {
-			'src': null, // the EVE-Oj.data source that created this table
+			'src': null, // the EVEoj.data source that created this table
 			'name': null, // the name of this table
 			'keyname': null, // the primary key name
 			'columns': [], // the list of columns
@@ -272,11 +272,11 @@ EVE-Oj.data.Table = EVE-Oj.data.Table || {};
 		
 })(jQuery);
 
-EVE-Oj.data.EntryIter = EVE-Oj.data.EntryIter || {};
+EVEoj.data.EntryIter = EVEoj.data.EntryIter || {};
 (function ($) {
-    var ME = EVE-Oj.data.EntryIter,
-		E = EVE-Oj,
-		D = EVE-Oj.data,
+    var ME = EVEoj.data.EntryIter,
+		E = EVEoj,
+		D = EVEoj.data,
 		_D = {
 			'curidx': 0,
 			'curseg': 0,
@@ -319,11 +319,11 @@ LoadTables(table_list, ctx) -> jQuery.Deferred.promise
 ...
 */
 // data source base class
-EVE-Oj.data.src_base = EVE-Oj.data.src_base || {};
+EVEoj.data.src_base = EVEoj.data.src_base || {};
 (function ($) {
-    var ME = EVE-Oj.data.src_base,
-		E = EVE-Oj,
-		D = EVE-Oj.data
+    var ME = EVEoj.data.src_base,
+		E = EVEoj,
+		D = EVEoj.data
 		;
 		
 	ME.c = {};
@@ -371,11 +371,11 @@ EVE-Oj.data.src_base = EVE-Oj.data.src_base || {};
 
 /*
 // data source based on AJAX calls to an API of some kind
-EVE-Oj.data.src_api = EVE-Oj.data.src_api || Object.create(EVE-Oj.data.src_base);
+EVEoj.data.src_api = EVEoj.data.src_api || Object.create(EVEoj.data.src_base);
 (function ($) {
-    var ME = EVE-Oj.data.src_api,
-		E = EVE-Oj,
-		D = EVE-Oj.data
+    var ME = EVEoj.data.src_api,
+		E = EVEoj,
+		D = EVEoj.data
 		;	
 })(jQuery);
 */

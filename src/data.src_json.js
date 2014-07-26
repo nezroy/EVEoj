@@ -1,10 +1,10 @@
 // data source based on JSON files
-var EVE-Oj = EVE-Oj || {};
-EVE-Oj.data.src_json = EVE-Oj.data.src_json || Object.create(EVE-Oj.data.src_base);
+var EVEoj = EVEoj || {};
+EVEoj.data.src_json = EVEoj.data.src_json || Object.create(EVEoj.data.src_base);
 (function ($) {
-    var ME = EVE-Oj.data.src_json,
-		E = EVE-Oj,
-		D = EVE-Oj.data,
+    var ME = EVEoj.data.src_json,
+		E = EVEoj,
+		D = EVEoj.data,
 		_LoadFileDone,
 		_LoadFileFail
 		;
@@ -33,7 +33,7 @@ EVE-Oj.data.src_json = EVE-Oj.data.src_json || Object.create(EVE-Oj.data.src_bas
 			'dataType': this.c['datatype'],
 			'cache': this.c['cache'],
 			'jsonp': false,
-			'jsonpCallback': 'EVE-Oj_metainf_callback',
+			'jsonpCallback': 'EVEoj_metainf_callback',
 			'url': this.c['path'] + '/metainf.' + this.c['datatype']
 		}).done(function (data, status, jqxhr) {
 			that.metainfDone(data, status, jqxhr, p, ctx);
@@ -127,7 +127,7 @@ EVE-Oj.data.src_json = EVE-Oj.data.src_json || Object.create(EVE-Oj.data.src_bas
 				'dataType': this.c['datatype'],
 				'cache': this.c['cache'],
 				'jsonp': false,
-				'jsonpCallback': 'EVE-Oj_' + jsf + '_callback',
+				'jsonpCallback': 'EVEoj_' + jsf + '_callback',
 				'url': this.c['path'] + '/' + jsf + '.' + this.c['datatype']
 			})
 			.done(function (data, status, jqxhr) { _LoadFileDone.apply(self, [jsf, data]) })

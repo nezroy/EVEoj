@@ -1,8 +1,8 @@
-var EVE-Oj = EVE-Oj || {};
-EVE-Oj.map = EVE-Oj.map || {};
+var EVEoj = EVEoj || {};
+EVEoj.map = EVEoj.map || {};
 (function ($) {
-    var ME = EVE-Oj.map,
-		E = EVE-Oj,
+    var ME = EVEoj.map,
+		E = EVEoj,
 		_D = { // default properties for new instances
 			'src': null,
 			'sysNameMap': {},

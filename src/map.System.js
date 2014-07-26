@@ -1,10 +1,10 @@
-var EVE-Oj = EVE-Oj || {};
-EVE-Oj.map = EVE-Oj.map || {};
-EVE-Oj.map.System = EVE-Oj.map.System || {};
+var EVEoj = EVEoj || {};
+EVEoj.map = EVEoj.map || {};
+EVEoj.map.System = EVEoj.map.System || {};
 (function ($) {
-    var ME = EVE-Oj.map.System,
-		E = EVE-Oj,
-		M = EVE-Oj.map,
+    var ME = EVEoj.map.System,
+		E = EVEoj,
+		M = EVEoj.map,
 		_D = {
 			'ID': null,
 			'name': null,
@@ -82,12 +82,12 @@ EVE-Oj.map.System = EVE-Oj.map.System || {};
 	
 })(jQuery);
 
-EVE-Oj.map.SystemIter = EVE-Oj.map.SystemIter || {};
+EVEoj.map.SystemIter = EVEoj.map.SystemIter || {};
 (function ($) {
-    var ME = EVE-Oj.map.SystemIter,
-		E = EVE-Oj,
-		M = EVE-Oj.map,
-		S = EVE-Oj.map.System,
+    var ME = EVEoj.map.SystemIter,
+		E = EVEoj,
+		M = EVEoj.map,
+		S = EVEoj.map.System,
 		_D = {
 			'curidx': 0,
 			'src': null,

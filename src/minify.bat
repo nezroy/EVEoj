@@ -1,2 +1,2 @@
-copy /b EVE-Oj.js+EVE-Oj.data.src_json.js+EVE-Oj.data.src_object.js+EVE-Oj.IGB.js+EVE-Oj.map.js+EVE-Oj.map.System.js EVE-Oj.all.js
-java -jar D:\Projects\yuicompressor-2.4.8.jar -v --charset utf-8 -o ..\js\EVE-Oj.all.min.js EVE-Oj.all.js
+copy /b core.js+data.src_json.js+data.src_object.js+IGB.js+map.js+map.System.js EVEoj.all.js
+java -jar D:\Projects\yuicompressor-2.4.8.jar -v --charset utf-8 -o ..\js\EVEoj.all.min.js EVEoj.all.js
