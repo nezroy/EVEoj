@@ -1,10 +1,10 @@
 // data source based on a pre-set JS object
-var EVEn = EVEn || {};
-EVEn.data.src_object = EVEn.data.src_object || Object.create(EVEn.data.src_base);
+var EVE-Oj = EVE-Oj || {};
+EVE-Oj.data.src_object = EVE-Oj.data.src_object || Object.create(EVE-Oj.data.src_base);
 (function ($) {
-    var ME = EVEn.data.src_object,
-		E = EVEn,
-		D = EVEn.data
+    var ME = EVE-Oj.data.src_object,
+		E = EVE-Oj,
+		D = EVE-Oj.data
 		;
 	
 	ME.metaInf = null;

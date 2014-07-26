@@ -1,9 +1,8 @@
-var EVEn = EVEn || {};
-EVEn.map = EVEn.map || {};
+var EVE-Oj = EVE-Oj || {};
+EVE-Oj.map = EVE-Oj.map || {};
 (function ($) {
-    var ME = EVEn.map,
-		E = EVEn,
-		_LYPM = 9.4605284e+15,
+    var ME = EVE-Oj.map,
+		E = EVE-Oj,
 		_D = { // default properties for new instances
 			'src': null,
 			'sysNameMap': {},
@@ -23,7 +22,7 @@ EVEn.map = EVEn.map || {};
 		},
 		_P = {} // public methods for this class
 		;
-	
+		
 	ME.Create = function(src, type, config, ctx) {
 		if (type != 'J' && type != 'K' && type != 'W') return null;
 		var map = Object.create(_P);
@@ -136,7 +135,7 @@ EVEn.map = EVEn.map || {};
 			;
 				
 		dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
-		return dist/_LYPM;
+		return dist/E.MPLY;
 	};
 
 	_P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
