@@ -1,133 +1,127 @@
-var EVEoj = EVEoj || {};
-EVEoj.map = EVEoj.map || {};
 EVEoj.map.System = EVEoj.map.System || {};
-(function ($) {
-    var ME = EVEoj.map.System,
-		E = EVEoj,
-		M = EVEoj.map,
-		_D = {
-			'ID': null,
-			'name': null,
-			'regionID': null,
-			'constellationID': null,
-			'pos': {'x': null, 'y': null, 'z': null},
-			'posMax': {'x': null, 'y': null, 'z': null},
-			'posMin': {'x': null, 'y': null, 'z': null},
-			'luminosity': null,
-			'border': null,
-			'fringe': null,
-			'corrider': null,
-			'hub': null,
-			'international': null,
-			'regional': null,
-			'constellation': null,
-			'contiguous': null,
-			'security': null,
-			'sec': null,
-			'factionID': null,
-			'radius': null,
-			'sunTypeID': null,
-			'securityClass': null,
-			'wormholeClassID': null,
-			'stationCount': null		
-		},
-		_P = {}
-		;		
+(function () {
+
+var ME = EVEoj.map.System,
+	// namespace quick refs
+	E = EVEoj,
+	M = EVEoj.map,
 	
-	ME.Create = function () {
-		var obj = Object.create(_P);
-		$.extend(true, obj, _D);
-		return obj;
-	};
+	_P = {}, // private methods
+	P = {} // public methods
+	;		
+ME.P = P;
+
+ME.D = {
+	'ID': null,
+	'name': null,
+	'regionID': null,
+	'constellationID': null,
+	'pos': {'x': null, 'y': null, 'z': null},
+	'posMax': {'x': null, 'y': null, 'z': null},
+	'posMin': {'x': null, 'y': null, 'z': null},
+	'luminosity': null,
+	'border': null,
+	'fringe': null,
+	'corrider': null,
+	'hub': null,
+	'international': null,
+	'regional': null,
+	'constellation': null,
+	'contiguous': null,
+	'security': null,
+	'sec': null,
+	'factionID': null,
+	'radius': null,
+	'sunTypeID': null,
+	'securityClass': null,
+	'wormholeClassID': null,
+	'stationCount': null		
+};
+ME.Create = function (tbl, ID) {	
+	var obj,
+		sys,
+		col
+		;
+		
+	sys = tbl.GetEntry(ID);
+	if (!sys) return null;
+	obj = E.create(P);
+	E.extend(true, obj, ME.D);
+	col = tbl.colmap;
 	
-	_P.LoadID = function (src, table, ID) {
-		var col,
-			sys
-			;
-		
-		if (!src || !table || !ID) return false;
-		if (!src.HasTable(table)) return false;
-		
-		if (!src.tables[table]['d'].hasOwnProperty(ID)) return false;
-		col = src.tables[table]['colmap'];
-		sys = src.tables[table]['d'][ID];
-		
-		this.ID = ID;
-		this.name = sys[col['solarSystemName']];
-		this.regionID = sys[col['regionId']];
-		this.constellationID = sys[col['constellationID']];
-		this.pos = {'x': sys[col['x']], 'y': sys[col['y']], 'z': sys[col['z']]};
-		this.posMin = {'x': sys[col['xMin']], 'y': sys[col['yMin']], 'z': sys[col['zMin']]};
-		this.posMax = {'x': sys[col['xMax']], 'y': sys[col['yMax']], 'z': sys[col['zMax']]};
-		this.luminosity = sys[col['luminosity']];
-		this.border = sys[col['border']];
-		this.fringe = sys[col['fringe']];
-		this.corridor = sys[col['corridor']];
-		this.hub = sys[col['hub']];
-		this.international = sys[col['international']];
-		this.regional = sys[col['regional']];
-		this.constellation = sys[col['constellation']];
-		this.contiguous = sys[col['contiguous']];
-		this.security = sys[col['security']];
-		this.sec = this.security.toFixed(1);
-		this.factionID = (sys[col['factionID']] != 0) ? sys[col['factionID']] : null;
-		this.radius = sys[col['radius']];
-		this.sunTypeID = sys[col['sunTypeID']];
-		this.securityClass = sys[col['securityClass']];
-		this.wormholeClassID = sys[col['wormholeClassID']];
-		this.stationCount = (sys[col['stationCount']]) ? sys[col['stationCount']] : 0;
-		
-		return true;
-	};	
+	obj.ID = ID;
+	obj.name = sys[col['solarSystemName']];
+	obj.regionID = sys[col['regionId']];
+	obj.constellationID = sys[col['constellationID']];
+	obj.pos = {'x': sys[col['x']], 'y': sys[col['y']], 'z': sys[col['z']]};
+	obj.posMin = {'x': sys[col['xMin']], 'y': sys[col['yMin']], 'z': sys[col['zMin']]};
+	obj.posMax = {'x': sys[col['xMax']], 'y': sys[col['yMax']], 'z': sys[col['zMax']]};
+	obj.luminosity = sys[col['luminosity']];
+	obj.border = sys[col['border']];
+	obj.fringe = sys[col['fringe']];
+	obj.corridor = sys[col['corridor']];
+	obj.hub = sys[col['hub']];
+	obj.international = sys[col['international']];
+	obj.regional = sys[col['regional']];
+	obj.constellation = sys[col['constellation']];
+	obj.contiguous = sys[col['contiguous']];
+	obj.security = sys[col['security']];
+	obj.sec = obj.security.toFixed(1);
+	obj.factionID = (sys[col['factionID']] != 0) ? sys[col['factionID']] : null;
+	obj.radius = sys[col['radius']];
+	obj.sunTypeID = sys[col['sunTypeID']];
+	obj.securityClass = sys[col['securityClass']];
+	obj.wormholeClassID = sys[col['wormholeClassID']];
+	obj.stationCount = (sys[col['stationCount']]) ? sys[col['stationCount']] : 0;
+
+	return obj;
+};
 	
-})(jQuery);
+})();
 
 EVEoj.map.SystemIter = EVEoj.map.SystemIter || {};
-(function ($) {
-    var ME = EVEoj.map.SystemIter,
-		E = EVEoj,
-		M = EVEoj.map,
-		S = EVEoj.map.System,
-		_D = {
-			'curidx': 0,
-			'src': null,
-			'tbl': null,
-			'keyset': []
-		},
-		_P = {}
+(function () {
+
+var ME = EVEoj.map.SystemIter,
+	// namespace quick refs
+	E = EVEoj,
+	M = EVEoj.map,
+	SYS = EVEoj.map.System,
+	
+	_P = {}, // private methods
+	P = {} // public methods
 	;
-	
-	ME.Create = function (src, tbl) {
-		var obj,
-			key
-			;
+ME.P = P;
 
-		if (!src || !src.HasTable(tbl)) return null;
+ME.D = {
+	// default object properties
+	'curidx': 0,
+	'tbl': null,
+	'keyset': []
+};
+ME.Create = function (tbl) {
+	var obj,
+		key
+		;
 
-		obj = Object.create(_P),			
-		$.extend(true, obj, _D);
-		obj.src = src;
-		obj.tbl = tbl;
-		
-		for (key in src.tables[tbl]['d']) {
-			if (!src.tables[tbl]['d'].hasOwnProperty(key)) continue;
-			obj.keyset.push(key);
-		}
-		
-		return obj;	
-	};
+	obj = E.create(P);
+	E.extend(true, obj, ME.D);
+	obj.tbl = tbl;
 	
-	_P.HasNext = function () {
-		if (this.curidx < this.keyset.length) return true;
-	};
+	for (key in tbl.data) {
+		if (!tbl.data.hasOwnProperty(key)) continue;
+		obj.keyset.push(key);
+	}
 	
-	_P.Next = function () {
-		var sys;
-			
-		sys = S.Create();
-		if (!sys.LoadID(this.src, this.tbl, this.keyset[this.curidx])) sys = null;
-		this.curidx++;
-		return sys;
-	};
+	return obj;	
+};
+
+P.HasNext = function () {
+	if (this.curidx < this.keyset.length) return true;
+};
+
+P.Next = function () {
+	return SYS.Create(this.tbl, this.keyset[this.curidx++]);
+};
 	
-})(jQuery);
+})();
