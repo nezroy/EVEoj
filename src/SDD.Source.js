@@ -45,8 +45,6 @@ P.GetTables = function () {
 };
 
 P.GetTable = function (tbl) {
-	var table;
-	
 	if (!tbl || !this.tables.hasOwnProperty(tbl)) return null;
 	return this.tables[tbl];
 };
