@@ -1,4 +1,3 @@
-var EVEoj = EVEoj || {};
 EVEoj.IGB = EVEoj.IGB || {};
 (function ($) {
 	var ME = EVEoj.IGB,
