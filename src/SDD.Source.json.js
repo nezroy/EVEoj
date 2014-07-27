@@ -76,7 +76,7 @@ P.LoadMeta = function(ctx) {
 	if (!this.cfg.hasOwnProperty('path') || typeof this.cfg['path'] != 'string') {
 		return p.rejectWith(ctx, [this, 'error', 'path is required']).promise();
 	}
-	if (!this.cfg['datatype'] != 'json' && this.cfg['datatype'] != 'jsonp') {
+	if (this.cfg['datatype'] != 'json' && this.cfg['datatype'] != 'jsonp') {
 		return p.rejectWith(ctx, [this, 'error', 'invalid datatype: ' + this.cfg['datatype']]).promise();
 	}
 
