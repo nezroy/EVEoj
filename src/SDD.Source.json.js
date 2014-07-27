@@ -95,23 +95,23 @@ P.LoadMeta = function(ctx) {
 	return p.promise();
 };
 
-_P.LoadFileDone = function(jsf, data) {
+_P.LoadFileDone = function(ctx, jsf, data) {
 	if (!data || !data.hasOwnProperty('tables')) {
-		this.jsonfiles[jsf].p.reject(jsf, 'error', 'invalid data object');
+		this.jsonfiles[jsf].p.rejectWith(ctx, [jsf, 'error', 'invalid data object']);
 	}
 	else if (!data.hasOwnProperty('formatID') || data['formatID'] != '1') {
-		this.jsonfiles[jsf].p.reject(jsf, 'error', 'unknown data format');
+		this.jsonfiles[jsf].p.rejectWith(ctx, [jsf, 'error', 'unknown data format']);
 	}
 	else {
 		this.jsonfiles[jsf].loaded = true;
 		this.jsonfiles[jsf].data = data;
-		this.jsonfiles[jsf].p.resolve(jsf, data);
+		this.jsonfiles[jsf].p.resolveWith(ctx, [jsf, data]);
 	}
 };
-_P.LoadFileFail = function(jsf, status, error) {
-	this.jsonfiles[jsf].p.reject(jsf, status, error);
+_P.LoadFileFail = function(ctx, jsf, status, error) {
+	this.jsonfiles[jsf].p.rejectWith(ctx, [jsf, status, error]);
 };	
-P.LoadTag = function(jsf) {
+P.LoadTag = function(jsf, ctx) {
 	var self = this;
 	if (this.jsonfiles[jsf].loaded) {
 		return E.deferred().resolveWith(null, [jsf, this.jsonfiles[jsf].data]).promise();
@@ -128,8 +128,8 @@ P.LoadTag = function(jsf) {
 			'jsonpCallback': 'EVEoj_' + jsf + '_callback',
 			'url': this.cfg['path'] + '/' + jsf + '.' + this.cfg['datatype']
 		})
-		.done(function (data, status, jqxhr) { _P.LoadFileDone.apply(self, [jsf, data]) })
-		.fail(function (jqxhr, status, error) { _P.LoadFileFail.apply(self, [jsf, status, error]) });
+		.done(function (data, status, jqxhr) { _P.LoadFileDone.apply(self, [ctx, jsf, data]) })
+		.fail(function (jqxhr, status, error) { _P.LoadFileFail.apply(self, [ctx, jsf, status, error]) });
 		return this.jsonfiles[jsf].p.promise();		
 	}	
 };	
