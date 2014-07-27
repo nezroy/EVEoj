@@ -135,7 +135,7 @@ EVEoj.map = EVEoj.map || {};
 			;
 				
 		dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
-		return dist/E.MPLY;
+		return dist/E.M_per_LY;
 	};
 
 	_P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {

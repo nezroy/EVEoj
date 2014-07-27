@@ -5,8 +5,13 @@ var ME = EVEoj,
 	F = function () {}	// if needed for Object.create polyfill
 	;
 
-ME.MPLY = 9.4605284e+15; // meters per lightyear
-ME.MPAU = 1; // meters per AU
+ME.V_MAJOR = 0;
+ME.V_MINOR = 1;
+ME.V_PATCH = 0;
+ME.VERSION = ME.V_MAJOR + '.' + ME.V_MINOR + '.' + ME.V_PATCH;
+
+ME.M_per_LY = 9.4605284e+15; // meters per lightyear
+ME.M_per_AU = 149597870700; // meters per AU
 
 // implementations from external stuff (mostly jQuery) that might theoretically change later
 ME.create = (typeof Object.create == 'function')

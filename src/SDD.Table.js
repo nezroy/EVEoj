@@ -6,22 +6,23 @@ var ME = EVEoj.SDD.Table,
 	E = EVEoj,
 	SDD = EVEoj.data,
 	
-	// default object properties
-	_D = {
-		'src': null, // the EVEoj.data source that created this table
-		'name': null, // the name of this table
-		'keyname': null, // the primary key name
-		'columns': [], // the list of columns
-		'colmap': {}, // a reverse lookup map for column indexes
-		'subkeys': [], // any subkeys (this implies a nested entry structure)
-		'indexes': [], // indexes available for secondary entry lookups
-		'segments': [] // the data for this table, in segments
-	},
-	
 	_P = {}, // private methods
 	P = {} // public methods
 	;
 			
+// default object properties
+ME.D = {
+	'src': null, // the EVEoj.SDD.Source that owns this table
+	'name': null, // the name of this table
+	'keyname': null, // the primary key name
+	'columns': [], // the list of columns
+	'colmap': {}, // a reverse lookup map for column indexes
+	'subkeys': [], // any subkeys (this implies a nested entry structure)
+	'data': {}, // the data for this table (shallow references into raw data from source)
+	'segments': [], // the segment information for this table
+	'length': 0, // the total number of entries in this table
+	'loaded': 0 // the total number of currently loaded entries
+};
 ME.Create = function (name, src, meta) {
 	var obj,
 		i,
@@ -29,7 +30,7 @@ ME.Create = function (name, src, meta) {
 		;
 							
 	obj = E.create(P);
-	E.extend(true, obj, _D);
+	E.extend(true, obj, ME.D);
 	
 	// sort out relevant metadata details
 	obj.src = src;
@@ -38,12 +39,12 @@ ME.Create = function (name, src, meta) {
 	// determine the source(s) of this table's data
 	if (meta.hasOwnProperty('j')) {
 		// only one segment and it is stored with other stuff
-		obj.segments.push({ 'min': 0, 'max': -1, 'tag': meta['j'], 'data': false, 'p': null });
+		obj.segments.push({ 'min': 0, 'max': -1, 'tag': meta['j'], 'loaded': false, 'p': null });
 	}
 	else if (meta.hasOwnProperty('s')) {
 		//  at least one segment that is stored independently
 		for (i = 0; i < meta['s'].length; i++) {
-			obj.segments.push({ 'min': meta['s'][i][1], 'max': meta['s'][i][2], 'tag': name + '_' + meta['s'][i][0], 'data': false, 'p': null });
+			obj.segments.push({ 'min': meta['s'][i][1], 'max': meta['s'][i][2], 'tag': name + '_' + meta['s'][i][0], 'loaded': false, 'p': null });
 		}
 	}
 	
@@ -59,9 +60,10 @@ ME.Create = function (name, src, meta) {
 		obj.keyname = keyarr.shift();
 		obj.subkeys.push(keyarr);
 	}
-	
-	if (meta.hasOwnProperty('i')) {
-		obj.indexes = obj.meta['i'];
+
+	// grab the length
+	if (meta.hasOwnProperty('l')) {
+		obj.length = meta['l'];
 	}
 	
 	return obj;
@@ -77,16 +79,19 @@ P.GetEntry = function (key) {
 	// is for segment comparison, string is for object property lookup
 	nkey = parseInt(key);
 	if (isNaN(nkey)) return null;
-	skey = nkey.toString(10);		
+	skey = nkey.toString(10);
+	if (this.data.hasOwnProperty(skey)) return this.data[skey];
+	
+	// if we don't have this key, determine if we ought to by now
 	for (i = 0; i < this.segments.length; i++) {
 		if (nkey >= this.segments[i].min && (nkey <= this.segments[i].max || this.segments[i].max == -1)) {
 			// the key should be in this segment
-			if (this.segments[i].data) {
+			if (this.segments[i].loaded) return null; // {
 				// the segment is loaded, so either we have this key or it doesn't exist
-				if (this.segments[i].data.hasOwnProperty(skey)) return this.segments[i].data[skey];
-				else return null;
-			}
-			else return false; // the segment isn't not loaded yet
+				// if (this.segments[i].data.hasOwnProperty(skey)) return this.segments[i].data[skey];
+				// else return null;
+			// }
+			else return false; // the segment isn't loaded yet
 		}
 	}
 	
@@ -111,9 +116,17 @@ _P.SegLoadDone = function(tag, data, done, p, ctx) {
 	done.has++;
 	for (i = 0; i < this.segments.length; i++) {
 		if (this.segments[i].tag != tag) continue;
-		this.segments[i].data = data;
+		if (data['tables'].hasOwnProperty(this.name) && data['tables'][this.name].hasOwnProperty('d')) {
+			E.extend(this.data, data['tables'][this.name]['d']);
+			if (data['tables'][this.name].hasOwnProperty('L')) {
+				this.loaded += data['tables'][this.name]['L'];
+			}
+			else if (done.needs == 1) {
+				this.loaded = this.length;
+			}
+		}
 		break;
-	}
+	}	
 	if (done.has >= done.needs) p.resolveWith(ctx, [this]);
 	else p.notifyWith(ctx, [this, done.has, done.needs]);
 };
@@ -140,7 +153,7 @@ P.Load = function(opts) {
 		// load all segments
 		all_needs = [];
 		for (i = 0; i < this.segments.length; i++) {
-			if (!this.segments[i].data) {
+			if (!this.segments[i].loaded) {
 				// this segment not yet loaded
 				all_needs.push(i);
 			}
@@ -181,9 +194,9 @@ P.Load = function(opts) {
 		}
 		
 		if (segment === -1) return p.rejectWith(o.ctx, [this, 'badkey', 'invalid key; no segment contains it']).promise();			
-		if (segment.data) return p.resolveWith(o.ctx, [this]).promise();
+		if (segment.loaded) return p.resolveWith(o.ctx, [this]).promise();
 		
-		if (segment.p == null) segment.p = this.src.LoadFile(segment.tag);			
+		if (segment.p == null) segment.p = this.src.LoadTag(segment.tag);
 		done = {'needs': 1, 'has': 0};
 		segment.p
 			.done(function (tag, data) { _P.SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
@@ -192,46 +205,14 @@ P.Load = function(opts) {
 		return p.promise();
 	}
 };
+
+P.ColIter = function (colname) {
+	var colnum;
+	if (this.colmap.hasOwnProperty(colname)) {
+		colnum = this.colmap[colname];
+		return function (e) { return e[colnum] };
+	}
+	else return function (e) { return undefined };	
+};
 		
 })();
-
-/*
-EVEoj.data.EntryIter = EVEoj.data.EntryIter || {};
-(function ($) {
-    var ME = EVEoj.data.EntryIter,
-		E = EVEoj,
-		D = EVEoj.data,
-		_D = {
-			'curidx': 0,
-			'curseg': 0,
-			'tbl': null
-		},
-		_P = {}
-	;
-	
-	ME.Create = function (tbl) {
-		var obj
-			;
-
-		obj = Object.create(_P),			
-		$.extend(true, obj, _D);
-		obj.tbl = tbl;
-		
-		return obj;	
-	};
-	
-	_P.HasNext = function () {
-		if (this.curidx < this.keyset.length) return true;
-	};
-	
-	_P.Next = function () {
-		var sys;
-			
-		sys = S.Create();
-		if (!sys.LoadID(this.src, this.tbl, this.keyset[this.curidx])) sys = null;
-		this.curidx++;
-		return sys;
-	};
-	
-})(jQuery);
-*/
