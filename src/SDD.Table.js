@@ -47,18 +47,21 @@ ME.Create = function (name, src, meta) {
 			obj.segments.push({ 'min': meta['s'][i][1], 'max': meta['s'][i][2], 'tag': name + '_' + meta['s'][i][0], 'loaded': false, 'p': null });
 		}
 	}
-	
-	// if this table has a column array, create a reverse lookup map for it
-	if (meta.hasOwnProperty('c') && meta['c'].length > 0) {
-		obj.columns.push(meta['c']);
-		for (i = 0; i < meta['c'].length; i++) obj.colmap[meta['c'][i]] = i;
-	}
-	
+		
 	// find out the key info for this table
 	if (meta.hasOwnProperty('k')) {
 		keyarr = meta['k'].split(':');
 		obj.keyname = keyarr.shift();
 		obj.subkeys.push(keyarr);
+	}
+	
+	// if this table has a column array, create a reverse lookup map for it
+	if (meta.hasOwnProperty('c') && meta['c'].length > 0) {
+		E.extend(true, obj.columns, meta['c']);
+		if (obj.keyname) obj.columns.unshift(obj.keyname);
+		else obj.columns.unshift('index');
+		for (i = 0; i < obj.columns.length; i++) obj.colmap[obj.columns[i]] = i;
+		obj.colmap['index'] = 0;
 	}
 
 	// grab the length
@@ -112,11 +115,18 @@ P.GetValue = function (key, col) {
 };
 
 _P.SegLoadDone = function(tag, data, done, p, ctx) {
-	var i;
+	var i, key;
 	done.has++;
 	for (i = 0; i < this.segments.length; i++) {
 		if (this.segments[i].tag != tag) continue;
-		if (data['tables'].hasOwnProperty(this.name) && data['tables'][this.name].hasOwnProperty('d')) {
+		if (data['tables'].hasOwnProperty(this.name) && data['tables'][this.name].hasOwnProperty('d')) {		
+			if (!data['tables'][this.name].hasOwnProperty('U')) {
+				// put the index value into the first column of every row
+				for (key in data['tables'][this.name]['d']) {
+					data['tables'][this.name]['d'][key].unshift(key);
+				}
+				data['tables'][this.name]['U'] = true;
+			}
 			E.extend(this.data, data['tables'][this.name]['d']);
 			if (data['tables'][this.name].hasOwnProperty('L')) {
 				this.loaded += data['tables'][this.name]['L'];
