@@ -101,12 +101,7 @@ P.GetEntry = function (key) {
 	// if we don't have this key, determine if we ought to by now
 	for (i = 0; i < this.segments.length; i++) {
 		if (nkey >= this.segments[i].min && (nkey <= this.segments[i].max || this.segments[i].max == -1)) {
-			// the key should be in this segment
-			if (this.segments[i].loaded) return null; // {
-				// the segment is loaded, so either we have this key or it doesn't exist
-				// if (this.segments[i].data.hasOwnProperty(skey)) return this.segments[i].data[skey];
-				// else return null;
-			// }
+			if (this.segments[i].loaded) return null; // the key should be in this segment
 			else return false; // the segment isn't loaded yet
 		}
 	}
@@ -149,11 +144,8 @@ _P.SegLoadDone = function(tag, data, done, p, ctx) {
 		if (this.segments[i].tag != tag) continue;
 		if (data['tables'].hasOwnProperty(this.name) && data['tables'][this.name].hasOwnProperty('d')) {		
 			if (!data['tables'][this.name].hasOwnProperty('U')) {
-				// put the index value into the first column of every row
+				// put the indexes into the first columns of every row
 				_P.UnshiftIndexes(data['tables'][this.name]['d'], []);
-				/* for (key in data['tables'][this.name]['d']) {
-					data['tables'][this.name]['d'][key].unshift(key);
-				} */
 				data['tables'][this.name]['U'] = true;
 			}
 			E.extend(this.data, data['tables'][this.name]['d']);
