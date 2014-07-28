@@ -17,6 +17,7 @@ ME.D = {
 	'keyname': null, // the primary key name
 	'columns': [], // the list of columns
 	'colmap': {}, // a reverse lookup map for column indexes
+	'colmeta': {}, // a map of metainfo about each complex column
 	'subkeys': [], // any subkeys (this implies a nested entry structure)
 	'data': {}, // the data for this table (shallow references into raw data from source)
 	'segments': [], // the segment information for this table
@@ -52,16 +53,28 @@ ME.Create = function (name, src, meta) {
 	if (meta.hasOwnProperty('k')) {
 		keyarr = meta['k'].split(':');
 		obj.keyname = keyarr.shift();
-		obj.subkeys.push(keyarr);
+		for (i = 0; i < keyarr.length; i++) obj.subkeys.push(keyarr[i]);
 	}
 	
-	// if this table has a column array, create a reverse lookup map for it
-	if (meta.hasOwnProperty('c') && meta['c'].length > 0) {
-		E.extend(true, obj.columns, meta['c']);
-		if (obj.keyname) obj.columns.unshift(obj.keyname);
-		else obj.columns.unshift('index');
-		for (i = 0; i < obj.columns.length; i++) obj.colmap[obj.columns[i]] = i;
-		obj.colmap['index'] = 0;
+	// add keys to the column definition
+	if (obj.keyname) obj.columns.push(obj.keyname);
+	else obj.columns.push('index');
+	for (i = 0; i < obj.subkeys.length; i++) {
+		obj.columns.push(obj.subkeys[i]);
+	}
+
+	// add meta columns to column definition
+	if (meta.hasOwnProperty('c')) {
+		for (i = 0; i < meta['c'].length; i++) obj.columns.push(meta['c'][i]);
+	}
+	
+	// create a reverse lookup map for columns
+	for (i = 0; i < obj.columns.length; i++) obj.colmap[obj.columns[i]] = i;
+	obj.colmap['index'] = 0;
+	
+	// grab the colmeta extra info
+	if (meta.hasOwnProperty('m')) {		
+		E.extend(true, obj.colmeta, meta['m']);
 	}
 
 	// grab the length
@@ -114,6 +127,21 @@ P.GetValue = function (key, col) {
 	return entry[col];
 };
 
+_P.UnshiftIndexes = function(data, indexes) {
+	var key, i;
+	for (key in data) {
+		if (!data.hasOwnProperty(key)) return;
+		if (!data[key]) return;
+		indexes.push(key);
+		if (data[key] instanceof Array) {		
+			for (i = indexes.length - 1; i >= 0; i--) {
+				data[key].unshift(indexes[i]);
+			}
+			indexes.pop();
+		}
+		else _P.UnshiftIndexes(data[key], indexes);
+	}
+};
 _P.SegLoadDone = function(tag, data, done, p, ctx) {
 	var i, key;
 	done.has++;
@@ -122,9 +150,10 @@ _P.SegLoadDone = function(tag, data, done, p, ctx) {
 		if (data['tables'].hasOwnProperty(this.name) && data['tables'][this.name].hasOwnProperty('d')) {		
 			if (!data['tables'][this.name].hasOwnProperty('U')) {
 				// put the index value into the first column of every row
-				for (key in data['tables'][this.name]['d']) {
+				_P.UnshiftIndexes(data['tables'][this.name]['d'], []);
+				/* for (key in data['tables'][this.name]['d']) {
 					data['tables'][this.name]['d'][key].unshift(key);
-				}
+				} */
 				data['tables'][this.name]['U'] = true;
 			}
 			E.extend(this.data, data['tables'][this.name]['d']);
