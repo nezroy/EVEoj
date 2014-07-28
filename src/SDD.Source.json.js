@@ -15,7 +15,8 @@ ME.D = E.extend(true, {}, SDD.Source.D, {
 	// default object properties
 	'cfg': {
 		'cache': true,
-		'datatype': 'json'
+		'datatype': 'json',
+		'timeout': 0
 	},
 	'jsonfiles': {}
 });
@@ -84,6 +85,7 @@ P.LoadMeta = function(ctx) {
 		'dataType': this.cfg['datatype'],
 		'cache': this.cfg['cache'],
 		'jsonp': false,
+		'timeout': this.cfg['timeout'],
 		'jsonpCallback': 'EVEoj_metainf_callback',
 		'url': this.cfg['path'] + '/metainf.' + this.cfg['datatype']
 	}).done(function (data, status, jqxhr) {
@@ -125,6 +127,7 @@ P.LoadTag = function(jsf, ctx) {
 			'dataType': this.cfg['datatype'],
 			'cache': this.cfg['cache'],
 			'jsonp': false,
+			'timeout': this.cfg['timeout'],
 			'jsonpCallback': 'EVEoj_' + jsf + '_callback',
 			'url': this.cfg['path'] + '/' + jsf + '.' + this.cfg['datatype']
 		})
