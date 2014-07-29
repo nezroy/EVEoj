@@ -22,7 +22,7 @@ ME.D = {
 	'luminosity': null,
 	'border': null,
 	'fringe': null,
-	'corrider': null,
+	'corridor': null,
 	'hub': null,
 	'international': null,
 	'regional': null,

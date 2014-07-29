@@ -7,7 +7,7 @@ var ME = EVEoj,
 
 ME.V_MAJOR = 0;
 ME.V_MINOR = 1;
-ME.V_PATCH = 1;
+ME.V_PATCH = 3;
 ME.VERSION = ME.V_MAJOR + '.' + ME.V_MINOR + '.' + ME.V_PATCH;
 
 ME.M_per_LY = 9.4605284e+15; // meters per lightyear
