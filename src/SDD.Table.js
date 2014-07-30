@@ -17,6 +17,7 @@ ME.D = {
 	'keyname': null, // the primary key name
 	'columns': [], // the list of columns
 	'colmap': {}, // a reverse lookup map for column indexes
+	'c': null, // shortcut to colmap
 	'colmeta': {}, // a map of metainfo about each complex column
 	'subkeys': [], // any subkeys (this implies a nested entry structure)
 	'data': {}, // the data for this table (shallow references into raw data from source)
@@ -71,6 +72,7 @@ ME.Create = function (name, src, meta) {
 	// create a reverse lookup map for columns
 	for (i = 0; i < obj.columns.length; i++) obj.colmap[obj.columns[i]] = i;
 	obj.colmap['index'] = 0;
+	obj.c = obj.colmap;
 	
 	// grab the colmeta extra info
 	if (meta.hasOwnProperty('m')) {		
@@ -127,7 +129,7 @@ _P.UnshiftIndexes = function(data, indexes) {
 	for (key in data) {
 		if (!data.hasOwnProperty(key)) return;
 		if (!data[key]) return;
-		indexes.push(key);
+		indexes.push(parseInt(key));
 		if (data[key] instanceof Array) {
 			for (i = indexes.length - 1; i >= 0; i--) {
 				data[key].unshift(indexes[i]);
@@ -244,6 +246,22 @@ P.ColIter = function (colname) {
 		return function (e) { return e[colnum] };
 	}
 	else return function (e) { return undefined };	
+};
+
+P.ColPred = function (colname, compare, value) {
+	var colnum;
+	if (this.colmap.hasOwnProperty(colname)) {
+		colnum = this.colmap[colname];
+		if (compare == '==' || compare == 'eq') return function (e) { return e[colnum] == value};
+		if (compare == '!=' || compare == 'ne') return function (e) { return e[colnum] != value};
+		if (compare == '===' || compare == 'seq') return function (e) { return e[colnum] === value};
+		if (compare == '!==' || compare == 'sne') return function (e) { return e[colnum] !== value};
+		else if (compare == '>' || compare == 'gt') return function (e) { return e[colnum] > value};
+		else if (compare == '>=' || compare == 'gte') return function (e) { return e[colnum] >= value};
+		else if (compare == '<' || compare == 'lt') return function (e) { return e[colnum] < value};
+		else if (compare == '<=' || compare == 'lte') return function (e) { return e[colnum] < value};
+	}
+	else return function (e) { return false };	
 };
 		
 })();
