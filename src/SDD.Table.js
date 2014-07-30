@@ -128,13 +128,13 @@ _P.UnshiftIndexes = function(data, indexes) {
 		if (!data.hasOwnProperty(key)) return;
 		if (!data[key]) return;
 		indexes.push(key);
-		if (data[key] instanceof Array) {		
+		if (data[key] instanceof Array) {
 			for (i = indexes.length - 1; i >= 0; i--) {
 				data[key].unshift(indexes[i]);
 			}
-			indexes.pop();
 		}
 		else _P.UnshiftIndexes(data[key], indexes);
+		indexes.pop();
 	}
 };
 _P.SegLoadDone = function(tag, data, done, p, ctx) {
