@@ -1,3 +1,4 @@
+/*
 var EVEoj = EVEoj || {};
 
 EVEoj.dogma = EVEoj.dogma || {};
@@ -54,3 +55,4 @@ EVEoj.dogma.ship = EVEoj.dogma.ship || Object.create(EVEoj.inv.item);
 	ME.advancedAgility = 0;
 
 })(jQuery);
+*/

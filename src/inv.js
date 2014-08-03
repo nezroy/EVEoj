@@ -1,4 +1,4 @@
-var EVEoj = EVEoj || {};
+/*var EVEoj = EVEoj || {};
 
 EVEoj.inv = EVEoj.inv || {};
 (function ($) {
@@ -39,3 +39,4 @@ EVEoj.inv.item = EVEoj.inv.item || {};
 	};
 
 })(jQuery);
+*/

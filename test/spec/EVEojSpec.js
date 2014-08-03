@@ -1,10 +1,10 @@
-'use strict';
+"use strict";
 
-var EVEoj = require('../../src/EVEoj.js');
+var EVEoj = require("../../src/EVEoj.js");
 
-describe('EVEoj', function() {
-    it('EVEoj.VERSION test', function() {
-        expect(EVEoj.VERSION).toEqual('0.2.0');
+describe("EVEoj", function() {
+    it("EVEoj.VERSION test", function() {
+        expect(EVEoj.VERSION).toEqual("0.2.0");
     });
 });
 

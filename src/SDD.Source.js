@@ -1,22 +1,21 @@
-'use strict';
+"use strict";
 
 // var Utils = require('./Utils');
 var P = exports.P = {}; // public methods
 
 exports.D = {
 	// default object properties
-	'tables': {},
-	'version': null,
-	'verdesc': null,
-	'schema': null
+	tables: {},
+	version: null,
+	verdesc: null,
+	schema: null
 };
 
 // return promise:
-//		rejectWith(ctx, [this, status, errmsg]);
-//		resolveWith(ctx, [this]);
-P.LoadMeta = function(ctx) {
-	/* p.rejectWith(ctx, [this, 'error', 'not implemented']);
-	return p.promise(); */
+//		reject({context: ctx, source: this, stats: status, error: errmsg});
+//		resolve({context: ctx, source: this});
+P.LoadMeta = function() {
+	return null;
 };
 
 P.HasTable = function (tbl) {

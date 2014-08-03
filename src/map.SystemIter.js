@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-var extend = require('node.extend');
-var Utils = require('./Utils.js');
-var System = require('./map.System.js');
+var extend = require("node.extend");
+var Utils = require("./Utils.js");
+var System = require("./map.System.js");
 
 var P = exports.P = {}; // public methods
 exports.D = {
 	// default object properties
-	'curidx': 0,
-	'tbl': null,
-	'keyset': []
+	curidx: 0,
+	tbl: null,
+	keyset: []
 };
 exports.Create = function (tbl) {
 	var obj,
