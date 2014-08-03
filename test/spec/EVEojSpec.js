@@ -1,6 +1,6 @@
 'use strict';
 
-var EVEoj = require('../../src/core');
+var EVEoj = require('../../src/EVEoj.js');
 
 describe('EVEoj', function() {
     it('EVEoj.VERSION test', function() {

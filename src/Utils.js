@@ -7,9 +7,6 @@ exports.isBrowser = typeof(window) !== 'undefined';
 var req_browser_ignore = require;
 var BB;
 
-// var extend = require('node.extend');
-// var Promise = require('bluebird');
-
 var F = function () {};
 
 // implementations from external stuff (mostly jQuery) that might theoretically change later
@@ -23,26 +20,20 @@ exports.create = (typeof Object.create == 'function')
 		F.prototype = o;
 		return new F();
 	};
-/*
-ME.extend = $.extend;
-ME.deferred = $.Deferred;
-ME.ajax = $.ajax;
-*/
-//exports.deferred = jQuery.Deferred;
+
 if (exports.isBrowser) {
+	// grab deferred from global, custom-built bluebird (inserted by uglify)
 	exports.deferred = Promise.defer;
+
+	// grab ajax from jQuery (implied dependency)
+	exports.ajax = jQuery.ajax;
 }
 else {
+	// bluebird required in a way that browserify will ignore (since using custom built for standalone)
 	BB = req_browser_ignore('bluebird');
 	exports.deferred = BB.defer;
 }
-exports.ajax = jQuery.ajax;
-/*
-function isBrowser() {
-    return typeof(window) !== 'undefined';
-}
-isBrowser();
-*/
+
 exports.FormatNum = function (val, fixed) {
 	var stringy = [],
 		base = String(Math.floor(val)),
