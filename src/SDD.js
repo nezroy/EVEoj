@@ -2,8 +2,8 @@
 
 // var Utils = require('./Utils');
 
-exports.Source = require('./SDD.Source');
-exports.Source.json = require('./SDD.Source.json');
+exports.Source = require('./SDD.Source.js');
+exports.Source.json = require('./SDD.Source.json.js');
 
 // create a new data source of the type specified with the config provided;
 // EVEoj.data.Source.<type> handles the implementation details

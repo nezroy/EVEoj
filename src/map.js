@@ -1,16 +1,14 @@
-EVEoj.map = EVEoj.map || {};
-(function () {
+'use strict';
 
-var ME = EVEoj.map,
-	// namespace quick refs
-	E = EVEoj,
+var extend = require('node.extend');
+var Const = require('./Const.js');
+var Utils = require('./Utils.js');
+var System = require('./map.System.js');
+var SystemIter = require('./map.SystemIter.js');
+
+var P = exports.P = {}; // public methods for this class
 	
-	_P = {}, // private methods
-	P = {} // public methods for this class
-	;
-ME.P = P;
-	
-ME.D = {
+exports.D = {
 	// default properties for new instances
 	'src': null,
 	'tables': {},
@@ -32,19 +30,19 @@ ME.D = {
 	}
 };
 	
-ME.Create = function(src, type, config) {
+exports.Create = function(src, type, config) {
 	if (!src || typeof src.HasTable != 'function') return null;
 	if (type != 'J' && type != 'K' && type != 'W') return null;
-	var obj = E.create(P);
-	E.extend(true, obj, ME.D);
-	if (config) E.extend(true, obj.c, config);
+	var obj = Utils.create(P);
+	extend(true, obj, exports.D);
+	if (config) extend(true, obj.c, config);
 	obj.src = src;
 	obj.space = type;
 	
 	return obj;
 };
 
-_P.LoadDone = function (tbl, ctx) {
+function LoadDone(tbl, ctx) {
 	var has = 0,
 		needs = 0,
 		key
@@ -57,23 +55,23 @@ _P.LoadDone = function (tbl, ctx) {
 	}
 	
 	if (has >= needs) {
-		_P.LoadInit.apply(this);
+		LoadInit.apply(this);
 		this.loadingP.resolveWith(ctx, [this]);
 	}
 	else this.loadingP.notifyWith(ctx, [this, has, needs]);
-};
-_P.LoadFail = function (tbl, ctx, status, error) {
+}
+function LoadFail(tbl, ctx, status, error) {
 	this.loadingP.rejectWith(ctx, [this, status, error]);
-};
+}
 P.Load = function(ctx) {
 	var self = this,
 		t = this.tables,
 		key
 		;
 
-	if (this.loaded) return E.deferred().resolveWith(ctx, [this]).promise();
+	if (this.loaded) return Utils.deferred().resolveWith(ctx, [this]).promise();
 	if (this.loadingP) return this.loadingP.promise();
-	this.loadingP = E.deferred();
+	this.loadingP = Utils.deferred();
 	
 	// setup required and optional tables
 	t['map' + this.space + 'Regions'] = false;
@@ -100,14 +98,14 @@ P.Load = function(ctx) {
 		t[key] = {'tbl': this.src.GetTable(key), 'done': false };
 		if (!t[key].tbl) return this.loadingP.rejectWith(ctx, [self, 'error', 'source does not contain requested table: ' + key]).promise();
 		t[key].tbl.Load()
-			.done(function (tbl) { _P.LoadDone.apply(self, [tbl, ctx]) })
-			.fail(function (tbl, status, err) { _P.LoadFail.apply(self, [tbl, ctx, status, err]) });
+			.done(function (tbl) { LoadDone.apply(self, [tbl, ctx]) })
+			.fail(function (tbl, status, err) { LoadFail.apply(self, [tbl, ctx, status, err]) });
 	}	
 	
 	return this.loadingP.promise();
 };
 
-_P.LoadInit = function () {
+function LoadInit() {
 	var systbl = this.tables['map' + this.space + 'SolarSystems'].tbl,
 		colmap = systbl.colmap,
 		solarSystemID,
@@ -142,7 +140,7 @@ _P.LoadInit = function () {
 		}
 	}
 	this.sysNames.sort();
-};
+}
 
 P.GetSystem = function (input) {
 	var systemID,
@@ -154,12 +152,12 @@ P.GetSystem = function (input) {
 	else if (input.hasOwnProperty('id')) systemID = input['id'];
 	else return null;
 	
-	system = ME.System.Create(this.tables['map' + this.space + 'SolarSystems'].tbl, systemID);
+	system = System.Create(this.tables['map' + this.space + 'SolarSystems'].tbl, systemID);
 	return system;
 };
 
 P.GetSystems = function () {
-	return ME.SystemIter.Create(this.tables['map' + this.space + 'SolarSystems'].tbl);
+	return SystemIter.Create(this.tables['map' + this.space + 'SolarSystems'].tbl);
 };	
 
 P.JumpDist = function (fromID, toID) {
@@ -175,7 +173,7 @@ P.JumpDist = function (fromID, toID) {
 		;
 			
 	dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
-	return dist/E.M_per_LY;
+	return dist/Const.M_per_LY;
 };
 
 P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
@@ -267,5 +265,3 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 	// route.unshift(toSystemID);
 	return route;
 };	
-
-})();

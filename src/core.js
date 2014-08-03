@@ -2,9 +2,10 @@
 
 var extend = require('node.extend');
 
-exports.Const = require('./Const');
-exports.Utils = require('./Utils');
-exports.SDD = require('./SDD');
+exports.Const = require('./Const.js');
+exports.Utils = require('./Utils.js');
+exports.SDD = require('./SDD.js');
+exports.map = require('./map.js');
 
 exports.V_MAJOR = 0;
 exports.V_MINOR = 2;

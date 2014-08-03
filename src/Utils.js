@@ -1,4 +1,4 @@
-/* globals jQuery */
+/* global jQuery: false */
 'use strict';
 
 // var extend = require('node.extend');
@@ -23,7 +23,13 @@ ME.ajax = $.ajax;
 */
 exports.deferred = jQuery.Deferred;
 exports.ajax = jQuery.ajax;
-
+/*
+function isBrowser() {
+    return typeof(window) !== 'undefined';
+}
+isBrowser();
+*/
+exports.isBrowser = typeof(window) !== 'undefined';
 exports.FormatNum = function (val, fixed) {
 	var stringy = [],
 		base = String(Math.floor(val)),

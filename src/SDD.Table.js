@@ -1,7 +1,7 @@
 'use strict';
 
 var extend = require('node.extend');
-var Utils = require('./Utils');
+var Utils = require('./Utils.js');
 
 var P = exports.P = {}; // public methods
 			

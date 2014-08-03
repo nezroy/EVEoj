@@ -1,17 +1,10 @@
-EVEoj.map.System = EVEoj.map.System || {};
-(function () {
+'use strict';
+var extend = require('node.extend');
+var Utils = require('./Utils.js');
 
-var ME = EVEoj.map.System,
-	// namespace quick refs
-	E = EVEoj,
-	M = EVEoj.map,
-	
-	_P = {}, // private methods
-	P = {} // public methods
-	;		
-ME.P = P;
+// var P = exports.P = {}; // public methods
 
-ME.D = {
+exports.D = {
 	'ID': null,
 	'name': null,
 	'regionID': null,
@@ -37,7 +30,7 @@ ME.D = {
 	'wormholeClassID': null,
 	'stationCount': null		
 };
-ME.Create = function (tbl, ID) {	
+exports.Create = function (tbl, ID) {	
 	var obj,
 		sys,
 		col
@@ -45,8 +38,8 @@ ME.Create = function (tbl, ID) {
 		
 	sys = tbl.GetEntry(ID);
 	if (!sys) return null;
-	obj = E.create(P);
-	E.extend(true, obj, ME.D);
+	obj = Utils.create(P);
+	extend(true, obj, exports.D);
 	col = tbl.colmap;
 	
 	obj.ID = ID;
@@ -76,52 +69,3 @@ ME.Create = function (tbl, ID) {
 
 	return obj;
 };
-	
-})();
-
-EVEoj.map.SystemIter = EVEoj.map.SystemIter || {};
-(function () {
-
-var ME = EVEoj.map.SystemIter,
-	// namespace quick refs
-	E = EVEoj,
-	M = EVEoj.map,
-	SYS = EVEoj.map.System,
-	
-	_P = {}, // private methods
-	P = {} // public methods
-	;
-ME.P = P;
-
-ME.D = {
-	// default object properties
-	'curidx': 0,
-	'tbl': null,
-	'keyset': []
-};
-ME.Create = function (tbl) {
-	var obj,
-		key
-		;
-
-	obj = E.create(P);
-	E.extend(true, obj, ME.D);
-	obj.tbl = tbl;
-	
-	for (key in tbl.data) {
-		if (!tbl.data.hasOwnProperty(key)) continue;
-		obj.keyset.push(key);
-	}
-	
-	return obj;	
-};
-
-P.HasNext = function () {
-	if (this.curidx < this.keyset.length) return true;
-};
-
-P.Next = function () {
-	return SYS.Create(this.tbl, this.keyset[this.curidx++]);
-};
-	
-})();
