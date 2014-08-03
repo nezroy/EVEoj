@@ -1,17 +1,12 @@
-EVEoj.SDD.Table = EVEoj.SDD.Table || {};
-(function () {
+'use strict';
 
-var ME = EVEoj.SDD.Table,
-	// namespace quick refs
-	E = EVEoj,
-	SDD = EVEoj.data,
-	
-	_P = {}, // private methods
-	P = {} // public methods
-	;
+var extend = require('node.extend');
+var Utils = require('./Utils');
+
+var P = exports.P = {}; // public methods
 			
 // default object properties
-ME.D = {
+exports.D = {
 	'src': null, // the EVEoj.SDD.Source that owns this table
 	'name': null, // the name of this table
 	'keyname': null, // the primary key name
@@ -25,14 +20,14 @@ ME.D = {
 	'length': 0, // the total number of entries in this table
 	'loaded': 0 // the total number of currently loaded entries
 };
-ME.Create = function (name, src, meta) {
+exports.Create = function (name, src, meta) {
 	var obj,
 		i,
 		keyarr
 		;
 							
-	obj = E.create(P);
-	E.extend(true, obj, ME.D);
+	obj = Utils.create(P);
+	extend(true, obj, exports.D);
 	
 	// sort out relevant metadata details
 	obj.src = src;
@@ -76,7 +71,7 @@ ME.Create = function (name, src, meta) {
 	
 	// grab the colmeta extra info
 	if (meta.hasOwnProperty('m')) {		
-		E.extend(true, obj.colmeta, meta['m']);
+		extend(true, obj.colmeta, meta['m']);
 	}
 
 	// grab the length
@@ -124,7 +119,7 @@ P.GetValue = function (key, col) {
 	return entry[col];
 };
 
-_P.UnshiftIndexes = function(data, indexes) {
+function UnshiftIndexes(data, indexes) {
 	var key, i;
 	for (key in data) {
 		if (!data.hasOwnProperty(key)) return;
@@ -135,11 +130,11 @@ _P.UnshiftIndexes = function(data, indexes) {
 				data[key].unshift(indexes[i]);
 			}
 		}
-		else _P.UnshiftIndexes(data[key], indexes);
+		else UnshiftIndexes(data[key], indexes);
 		indexes.pop();
 	}
-};
-_P.SegLoadDone = function(tag, data, done, p, ctx) {
+}
+function SegLoadDone(tag, data, done, p, ctx) {
 	var i, key;
 	done.has++;
 	for (i = 0; i < this.segments.length; i++) {
@@ -147,10 +142,10 @@ _P.SegLoadDone = function(tag, data, done, p, ctx) {
 		if (data['tables'].hasOwnProperty(this.name) && data['tables'][this.name].hasOwnProperty('d')) {		
 			if (!data['tables'][this.name].hasOwnProperty('U')) {
 				// put the indexes into the first columns of every row
-				_P.UnshiftIndexes(data['tables'][this.name]['d'], []);
+				UnshiftIndexes(data['tables'][this.name]['d'], []);
 				data['tables'][this.name]['U'] = true;
 			}
-			E.extend(this.data, data['tables'][this.name]['d']);
+			extend(this.data, data['tables'][this.name]['d']);
 			if (data['tables'][this.name].hasOwnProperty('L')) {
 				this.loaded += data['tables'][this.name]['L'];
 			}
@@ -162,15 +157,15 @@ _P.SegLoadDone = function(tag, data, done, p, ctx) {
 	}	
 	if (done.has >= done.needs) p.resolveWith(ctx, [this]);
 	else p.notifyWith(ctx, [this, done.has, done.needs]);
-};
-_P.SegLoadFail = function(tag, status, error, p, ctx) {
+}
+function SegLoadFail(tag, status, error, p, ctx) {
 	p.rejectWith(ctx, [this, status, error]);
-};
+}
 
 // load data for this table; returns a deferred promise object as this is an async thing
 // if key is provided, loads ONLY the segment containing that key
 P.Load = function(opts) {
-	var p = E.deferred(),
+	var p = Utils.deferred(),
 		self = this,
 		all_needs,
 		done,
@@ -180,7 +175,7 @@ P.Load = function(opts) {
 		segment,
 		o = {'ctx': null, 'key': null}
 		;
-	E.extend(o, opts);
+	extend(o, opts);
 	
 	if (o.key === null) {
 		// load all segments
@@ -199,8 +194,8 @@ P.Load = function(opts) {
 					this.segments[all_needs[i]].p = this.src.LoadTag(this.segments[i].tag);
 				}
 				this.segments[all_needs[i]].p
-					.done(function (tag, data) { _P.SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
-					.fail(function (tag, status, error) { _P.SegLoadFail.apply(self, [tag, status, error, p, o.ctx]) });
+					.done(function (tag, data) { SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
+					.fail(function (tag, status, error) { SegLoadFail.apply(self, [tag, status, error, p, o.ctx]) });
 			}
 			return p.promise();
 		}
@@ -232,8 +227,8 @@ P.Load = function(opts) {
 		if (segment.p == null) segment.p = this.src.LoadTag(segment.tag);
 		done = {'needs': 1, 'has': 0};
 		segment.p
-			.done(function (tag, data) { _P.SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
-			.fail(function (tag, status, error) { _P.SegLoadFail.apply(self, [tag, status, error, p, o.ctx]) });
+			.done(function (tag, data) { SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
+			.fail(function (tag, status, error) { SegLoadFail.apply(self, [tag, status, error, p, o.ctx]) });
 		
 		return p.promise();
 	}
@@ -263,5 +258,3 @@ P.ColPred = function (colname, compare, value) {
 	}
 	else return function (e) { return false };	
 };
-		
-})();

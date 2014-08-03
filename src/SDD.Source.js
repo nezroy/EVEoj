@@ -1,31 +1,22 @@
-EVEoj.SDD.Source = EVEoj.SDD.Source || {};
-(function () {
+'use strict';
 
-var ME = EVEoj.SDD.Source,
-	// namespace quick refs
-	E = EVEoj,
-	SDD = EVEoj.SDD,
+// var Utils = require('./Utils');
+var P = exports.P = {}; // public methods
 
-	_P = {}, // private methods
-	P = {} // public methods
-	;
-ME.P = P;
-
-ME.D = {
+exports.D = {
 	// default object properties
 	'tables': {},
 	'version': null,
 	'verdesc': null,
 	'schema': null
 };
-P.Create = function(config) { return null; };
 
 // return promise:
 //		rejectWith(ctx, [this, status, errmsg]);
 //		resolveWith(ctx, [this]);
 P.LoadMeta = function(ctx) {
-	p.rejectWith(ctx, [this, 'error', 'not implemented']);
-	return p.promise();
+	/* p.rejectWith(ctx, [this, 'error', 'not implemented']);
+	return p.promise(); */
 };
 
 P.HasTable = function (tbl) {
@@ -48,5 +39,3 @@ P.GetTable = function (tbl) {
 	if (!tbl || !this.tables.hasOwnProperty(tbl)) return null;
 	return this.tables[tbl];
 };
-		
-})();

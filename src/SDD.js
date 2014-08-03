@@ -1,15 +1,13 @@
-EVEoj.SDD = EVEoj.SDD || {};
-(function () {
+'use strict';
 
-var ME = EVEoj.SDD,
-	E = EVEoj
-	;
+// var Utils = require('./Utils');
+
+exports.Source = require('./SDD.Source');
+exports.Source.json = require('./SDD.Source.json');
 
 // create a new data source of the type specified with the config provided;
 // EVEoj.data.Source.<type> handles the implementation details
-ME.Create = function(type, config) {
-	if (typeof ME.Source[type] == 'undefined' || typeof ME.Source[type].Create != 'function') return null;
-	return ME.Source[type].Create(config);
+exports.Create = function(type, config) {
+	if (typeof exports.Source[type] == 'undefined' || typeof exports.Source[type].Create != 'function') return null;
+	return exports.Source[type].Create(config);
 };
-	
-})();

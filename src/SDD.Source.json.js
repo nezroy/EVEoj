@@ -1,17 +1,13 @@
-EVEoj.SDD.Source.json = EVEoj.SDD.Source.json || {};
-(function () {
+'use strict';
 
-var ME = EVEoj.SDD.Source.json,
-	// namespace quick refs
-	E = EVEoj,
-	SDD = EVEoj.SDD,
+var extend = require('node.extend');
+var Source = require('./SDD.Source');
+var Table = require('./SDD.Table');
+var Utils = require('./Utils');
 		
-	_P = {}, // private methods
-	P = E.create(SDD.Source.P) // public methods, inherit from base Source class
-	;
-ME.P = P;
+var P = exports.P = Utils.create(Source.P); // public methods, inherit from base Source class
 
-ME.D = E.extend(true, {}, SDD.Source.D, {
+exports.D = extend(true, {}, Source.D, {
 	// default object properties
 	'cfg': {
 		'cache': true,
@@ -20,18 +16,19 @@ ME.D = E.extend(true, {}, SDD.Source.D, {
 	},
 	'jsonfiles': {}
 });
-ME.Create = function(config) {
-	var obj = E.create(P);
-	E.extend(true, obj, ME.D);
+
+exports.Create = function(config) {
+	var obj = Utils.create(P);
+	extend(true, obj, exports.D);
 	obj.Config(config);
 	return obj;
 };
 
 P.Config = function(config) {
-	E.extend(this.cfg, config);
+	extend(this.cfg, config);
 };
 
-_P.MetainfDone = function (data, status, jqxhr, p, ctx) {
+function MetainfDone(data, status, jqxhr, p, ctx) {
 	var tbl,
 		newt,
 		i;
@@ -52,7 +49,7 @@ _P.MetainfDone = function (data, status, jqxhr, p, ctx) {
 		if (!data['tables'].hasOwnProperty(tbl)) continue;
 		
 		// create a new table from our metadata
-		newt = SDD.Table.Create(tbl, this, data['tables'][tbl]);
+		newt = Table.Create(tbl, this, data['tables'][tbl]);
 		this.tables[newt.name] = newt;
 		
 		// collect a list of json sources
@@ -63,15 +60,15 @@ _P.MetainfDone = function (data, status, jqxhr, p, ctx) {
 	}
 	
 	p.resolveWith(ctx, [this]);
-};
+}
 
-_P.MetainfFail = function (jqxhr, status, error, p, ctx) {
+function MetainfFail(jqxhr, status, error, p, ctx) {
 	p.rejectWith(ctx, [this, status, error]);
-};
+}
 
 P.LoadMeta = function(ctx) {
 	var self = this,
-		p = E.deferred()
+		p = Utils.deferred()
 		;
 		
 	if (!this.cfg.hasOwnProperty('path') || typeof this.cfg['path'] != 'string') {
@@ -81,7 +78,7 @@ P.LoadMeta = function(ctx) {
 		return p.rejectWith(ctx, [this, 'error', 'invalid datatype: ' + this.cfg['datatype']]).promise();
 	}
 
-	E.ajax({
+	Utils.ajax({
 		'dataType': this.cfg['datatype'],
 		'cache': this.cfg['cache'],
 		'jsonp': false,
@@ -89,15 +86,15 @@ P.LoadMeta = function(ctx) {
 		'jsonpCallback': 'EVEoj_metainf_callback',
 		'url': this.cfg['path'] + '/metainf.' + this.cfg['datatype']
 	}).done(function (data, status, jqxhr) {
-		_P.MetainfDone.apply(self, [data, status, jqxhr, p, ctx]);
+		MetainfDone.apply(self, [data, status, jqxhr, p, ctx]);
 	}).fail(function (jqxhr, status, error) {
-		_P.MetainfFail.apply(self, [jqxhr, status, error, p, ctx]);
+		MetainfFail.apply(self, [jqxhr, status, error, p, ctx]);
 	});
 	
 	return p.promise();
 };
 
-_P.LoadFileDone = function(ctx, jsf, data) {
+function LoadFileDone(ctx, jsf, data) {
 	if (!data || !data.hasOwnProperty('tables')) {
 		this.jsonfiles[jsf].p.rejectWith(ctx, [jsf, 'error', 'invalid data object']);
 	}
@@ -109,21 +106,21 @@ _P.LoadFileDone = function(ctx, jsf, data) {
 		this.jsonfiles[jsf].data = data;
 		this.jsonfiles[jsf].p.resolveWith(ctx, [jsf, data]);
 	}
-};
-_P.LoadFileFail = function(ctx, jsf, status, error) {
+}
+function LoadFileFail(ctx, jsf, status, error) {
 	this.jsonfiles[jsf].p.rejectWith(ctx, [jsf, status, error]);
-};	
+}
 P.LoadTag = function(jsf, ctx) {
 	var self = this;
 	if (this.jsonfiles[jsf].loaded) {
-		return E.deferred().resolveWith(null, [jsf, this.jsonfiles[jsf].data]).promise();
+		return Utils.deferred().resolveWith(null, [jsf, this.jsonfiles[jsf].data]).promise();
 	}
 	else if (this.jsonfiles[jsf].p != null) {
 		return this.jsonfiles[jsf].p.promise();
 	}
 	else {
-		this.jsonfiles[jsf].p = E.deferred();
-		E.ajax({
+		this.jsonfiles[jsf].p = Utils.deferred();
+		Utils.ajax({
 			'dataType': this.cfg['datatype'],
 			'cache': this.cfg['cache'],
 			'jsonp': false,
@@ -131,10 +128,8 @@ P.LoadTag = function(jsf, ctx) {
 			'jsonpCallback': 'EVEoj_' + jsf + '_callback',
 			'url': this.cfg['path'] + '/' + jsf + '.' + this.cfg['datatype']
 		})
-		.done(function (data, status, jqxhr) { _P.LoadFileDone.apply(self, [ctx, jsf, data]) })
-		.fail(function (jqxhr, status, error) { _P.LoadFileFail.apply(self, [ctx, jsf, status, error]) });
+		.done(function (data, status, jqxhr) { LoadFileDone.apply(self, [ctx, jsf, data]) })
+		.fail(function (jqxhr, status, error) { LoadFileFail.apply(self, [ctx, jsf, status, error]) });
 		return this.jsonfiles[jsf].p.promise();		
 	}	
-};	
-	
-})();
+};

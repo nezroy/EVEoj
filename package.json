@@ -1,0 +1,37 @@
+{
+  "name": "EVEoj",
+  "version": "0.2.0",
+  "description": "EVE Online JS library",
+  "main": "src/core.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xyjax/EVEoj.git"
+  },
+  "keywords": [
+    "EVE",
+    "EVE Online",
+    "JavaScript",
+    "library"
+  ],
+  "author": "nezroy",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/xyjax/EVEoj/issues"
+  },
+  "homepage": "http://eve-oj.com",
+  "dependencies": {
+    "node.extend": "^1.0.10"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^2.1.4",
+    "grunt-contrib-jasmine": "^0.7.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.5.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jasmine-node": "^0.2.1"
+  }
+}

@@ -1,69 +1,12 @@
-var EVEoj = EVEoj || {};
-(function ($) {
+'use strict';
 
-var ME = EVEoj,
-	F = function () {}	// if needed for Object.create polyfill
-	;
+var extend = require('node.extend');
 
-ME.V_MAJOR = 0;
-ME.V_MINOR = 1;
-ME.V_PATCH = 4;
-ME.VERSION = ME.V_MAJOR + '.' + ME.V_MINOR + '.' + ME.V_PATCH;
+exports.Const = require('./Const');
+exports.Utils = require('./Utils');
+exports.SDD = require('./SDD');
 
-ME.M_per_LY = 9.4605284e+15; // meters per lightyear
-ME.M_per_AU = 149597870700; // meters per AU
-
-// implementations from external stuff (mostly jQuery) that might theoretically change later
-ME.create = (typeof Object.create == 'function')
-	? Object.create
-	: function (o) {
-		// object create polyfill (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
-		if (arguments.length > 1) throw Error('Second argument not supported');
-		if (o === null) throw Error('Cannot set a null [[Prototype]]');
-		if (typeof o != 'object') throw TypeError('Argument must be an object');
-		F.prototype = o;
-		return new F();
-	};
-ME.extend = $.extend;
-ME.deferred = $.Deferred;
-ME.ajax = $.ajax;
-
-// utility stuff
-
-ME.FormatNum = function (val, fixed) {
-	var stringy = [],
-		base = String(Math.floor(val)),
-		k = -1,
-		i = 0,
-		decimals
-		;
-	
-	fixed = fixed || 0;
-	
-	for (i = base.length - 1; i >= 0; i--) {
-		if (k % 3 == 0) {
-			k = 1;
-			stringy.push(",");
-		}
-		else if (k == -1) {
-			k = 1;
-		}
-		else {
-			k++;
-		}
-		stringy.push(base.charAt(i));
-	}
-	base = "";
-	for (i = stringy.length - 1; i >= 0; i--) {
-		base = base.concat(stringy[i]);
-	}		
-	
-	if (fixed > 0) {
-		decimals = val.toFixed(fixed);
-		base += decimals.substring(decimals.length - fixed - 1);
-	}
-	
-	return base;
-};
-	
-})(jQuery);
+exports.V_MAJOR = 0;
+exports.V_MINOR = 2;
+exports.V_PATCH = 0;
+exports.VERSION = exports.V_MAJOR + '.' + exports.V_MINOR + '.' + exports.V_PATCH;

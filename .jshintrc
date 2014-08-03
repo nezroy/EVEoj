@@ -1,0 +1,43 @@
+{
+/*  "asi": false,
+  "bitwise": true,
+  "boss": true, */
+  "camelcase": false,
+/*  "eqeqeq": true,
+  "eqnull": true,
+  "evil": true,
+  "expr": true,
+  "forin": true,
+  "immed": true,
+  "indent": 2,
+  "latedef": false,
+  "maxcomplexity": 6,
+  "maxdepth": 4,
+  "maxlen": 80,
+  "maxparams": 4,
+  "maxstatements": 300,
+  "newcap": true,
+  "noarg": true,
+  "noempty": true,
+  "nonew": true,
+  "quotmark": true,
+  */
+  "strict": false,
+  "node": true,
+  /*
+  "trailing": true,
+  "undef": true,
+  "browser": true,
+  "jquery": true, */
+  "globals": {
+	"require": false,
+	/* jasmine */
+    "after": false,
+    "afterEach": false,
+    "before": false,
+    "beforeEach": false,
+    "describe": false,
+	"expect": false,
+    "it": false
+  }
+}
