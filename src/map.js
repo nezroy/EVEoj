@@ -56,12 +56,12 @@ function LoadDone(tbl, ctx) {
 	
 	if (has >= needs) {
 		LoadInit.apply(this);
-		this.loadingP.resolveWith(ctx, [this]);
+		this.loadingP.resolve({context: ctx, map: this});
 	}
-	else this.loadingP.notifyWith(ctx, [this, has, needs]);
+	else this.loadingP.progress({context: ctx, map: this, has: has, needs: needs});
 }
 function LoadFail(tbl, ctx, status, error) {
-	this.loadingP.rejectWith(ctx, [this, status, error]);
+	this.loadingP.reject({context: ctx, map: this, status: status, error: error});
 }
 P.Load = function(ctx) {
 	var self = this,
@@ -69,8 +69,8 @@ P.Load = function(ctx) {
 		key
 		;
 
-	if (this.loaded) return Utils.deferred().resolveWith(ctx, [this]).promise();
-	if (this.loadingP) return this.loadingP.promise();
+	if (this.loaded) return Utils.deferred().resolve({context: ctx, map: this}).promise;
+	if (this.loadingP) return this.loadingP.promise;
 	this.loadingP = Utils.deferred();
 	
 	// setup required and optional tables
@@ -96,13 +96,13 @@ P.Load = function(ctx) {
 	for (key in t) {
 		if (!t.hasOwnProperty(key)) continue;
 		t[key] = {'tbl': this.src.GetTable(key), 'done': false };
-		if (!t[key].tbl) return this.loadingP.rejectWith(ctx, [self, 'error', 'source does not contain requested table: ' + key]).promise();
+		if (!t[key].tbl) return this.loadingP.reject({context: ctx, map: self, status: 'error', error: 'source does not contain requested table: ' + key}).promise;
 		t[key].tbl.Load()
-			.done(function (tbl) { LoadDone.apply(self, [tbl, ctx]) })
-			.fail(function (tbl, status, err) { LoadFail.apply(self, [tbl, ctx, status, err]) });
+			.done(function (arg) { LoadDone.apply(self, [arg.table, arg.context]) })
+			.fail(function (arg) { LoadFail.apply(self, [arg.table, arg.context, arg.status, arg.error]) });
 	}	
 	
-	return this.loadingP.promise();
+	return this.loadingP.promise;
 };
 
 function LoadInit() {

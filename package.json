@@ -2,7 +2,7 @@
   "name": "EVEoj",
   "version": "0.2.0",
   "description": "EVE Online JS library",
-  "main": "src/core.js",
+  "main": "src/EVEoj.js",
   "scripts": {
     "test": "grunt"
   },
@@ -23,6 +23,7 @@
   },
   "homepage": "http://eve-oj.com",
   "dependencies": {
+    "bluebird": "^2.2.2",
     "node.extend": "^1.0.10"
   },
   "devDependencies": {
@@ -32,6 +33,7 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.5.1",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-jasmine-node": "^0.2.1"
+    "grunt-jasmine-node": "^0.2.1",
+    "grunt-watchify": "^0.1.0"
   }
 }

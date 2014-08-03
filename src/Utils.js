@@ -1,7 +1,14 @@
 /* global jQuery: false */
+/* global Promise: false */
 'use strict';
 
+exports.isBrowser = typeof(window) !== 'undefined';
+
+var req_browser_ignore = require;
+var BB;
+
 // var extend = require('node.extend');
+// var Promise = require('bluebird');
 
 var F = function () {};
 
@@ -21,7 +28,14 @@ ME.extend = $.extend;
 ME.deferred = $.Deferred;
 ME.ajax = $.ajax;
 */
-exports.deferred = jQuery.Deferred;
+//exports.deferred = jQuery.Deferred;
+if (exports.isBrowser) {
+	exports.deferred = Promise.defer;
+}
+else {
+	BB = req_browser_ignore('bluebird');
+	exports.deferred = BB.defer;
+}
 exports.ajax = jQuery.ajax;
 /*
 function isBrowser() {
@@ -29,7 +43,6 @@ function isBrowser() {
 }
 isBrowser();
 */
-exports.isBrowser = typeof(window) !== 'undefined';
 exports.FormatNum = function (val, fixed) {
 	var stringy = [],
 		base = String(Math.floor(val)),

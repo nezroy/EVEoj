@@ -152,14 +152,14 @@ function SegLoadDone(tag, data, done, p, ctx) {
 			else if (done.needs == 1) {
 				this.loaded = this.length;
 			}
-		}
+		}		
 		break;
 	}	
-	if (done.has >= done.needs) p.resolveWith(ctx, [this]);
-	else p.notifyWith(ctx, [this, done.has, done.needs]);
+	if (done.has >= done.needs) p.resolve({context: ctx, table: this});
+	else p.progress({context: ctx, table: this, has: done.has, needs: done.needs});
 }
 function SegLoadFail(tag, status, error, p, ctx) {
-	p.rejectWith(ctx, [this, status, error]);
+	p.reject({context: ctx, table: this, status: status, error: error});
 }
 
 // load data for this table; returns a deferred promise object as this is an async thing
@@ -193,23 +193,24 @@ P.Load = function(opts) {
 					// this segment not pending load
 					this.segments[all_needs[i]].p = this.src.LoadTag(this.segments[i].tag);
 				}
-				this.segments[all_needs[i]].p
-					.done(function (tag, data) { SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
-					.fail(function (tag, status, error) { SegLoadFail.apply(self, [tag, status, error, p, o.ctx]) });
+				this.segments[all_needs[i]].p.then(
+					function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.ctx]) },
+					function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.ctx]) }
+				);
 			}
-			return p.promise();
+			return p.promise;
 		}
 		else {
-			p.resolveWith(o.ctx, [this]);
-			return p.promise();
+			p.resolve({context: o.ctx, table: this});
+			return p.promise;
 		}	
 	}
 	else {
 		// determine which segment the key is in
 		nkey = parseInt(o.key);
 		if (isNaN(nkey)) {
-			p.rejectWith(o.ctx, [this, 'badkey', 'invalid key; not numeric']);
-			return this.p.promise();
+			p.reject({context: o.ctx, table: this, status: 'badkey', error: 'invalid key; not numeric'});
+			return this.p.promise;
 		}
 		skey = nkey.toString(10);
 		segment = -1;
@@ -221,16 +222,17 @@ P.Load = function(opts) {
 			}
 		}
 		
-		if (segment === -1) return p.rejectWith(o.ctx, [this, 'badkey', 'invalid key; no segment contains it']).promise();			
-		if (segment.loaded) return p.resolveWith(o.ctx, [this]).promise();
+		if (segment === -1) return p.reject({context: o.ctx, table: this, status: 'badkey', error: 'invalid key; no segment contains it'}).promise;
+		if (segment.loaded) return p.resolve({context: o.ctx, table: this}).promise;
 		
 		if (segment.p == null) segment.p = this.src.LoadTag(segment.tag);
 		done = {'needs': 1, 'has': 0};
-		segment.p
-			.done(function (tag, data) { SegLoadDone.apply(self, [tag, data, done, p, o.ctx]) })
-			.fail(function (tag, status, error) { SegLoadFail.apply(self, [tag, status, error, p, o.ctx]) });
+		segment.p.then(
+			function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.ctx]) },
+			function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.ctx]) }
+		);
 		
-		return p.promise();
+		return p.promise;
 	}
 };
 
