@@ -11,15 +11,15 @@ var promise_fail;
 function promise_wait() {
 	if (promise_done) return true;
 	return false;
-};
-function promise_thenDone(arg) {
+}
+function promise_thenDone() {
 	promise_done = true;
 	promise_fail = false;
-};
-function promise_thenFail(arg) {
+}
+function promise_thenFail() {
 	promise_done = true;
 	promise_fail = true;
-};
+}
 
 describe("SDD.Table setup", function() {
 	it("loads a valid source", function() {

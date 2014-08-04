@@ -15,27 +15,27 @@ var promise2_fail;
 function promise1_wait() {
 	if (promise1_done) return true;
 	return false;
-};
-function promise1_thenDone(arg) {
+}
+function promise1_thenDone() {
 	promise1_done = true;
 	promise1_fail = false;
-};
-function promise1_thenFail(arg) {
+}
+function promise1_thenFail() {
 	promise1_done = true;
 	promise1_fail = true;
-};
+}
 function promise2_wait() {
 	if (promise2_done) return true;
 	return false;
-};
-function promise2_thenDone(arg) {
+}
+function promise2_thenDone() {
 	promise2_done = true;
 	promise2_fail = false;
-};
-function promise2_thenFail(arg) {
+}
+function promise2_thenFail() {
 	promise2_done = true;
 	promise2_fail = true;
-};
+}
 
 describe("SDD.Source.LoadMeta", function() {
     it("returns a promise for a bad path", function() {

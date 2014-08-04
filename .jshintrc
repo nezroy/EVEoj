@@ -78,6 +78,8 @@
 		"beforeEach": false,
 		"describe": false,
 		"expect": false,
-		"it": false
+		"it": false,
+		"runs": false,
+		"waitsFor": false
 	}
 }
