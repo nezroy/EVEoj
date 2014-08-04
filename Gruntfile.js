@@ -19,7 +19,7 @@ module.exports = function(grunt) {
             specFolders: ["test/spec"]
         },		
 		browserify: {
-			standalone: {
+			main: {
 				src: ["./src/EVEoj.js"],
 				dest: "./dist/<%= pkg.name %>.js",
 				options: {
@@ -28,25 +28,50 @@ module.exports = function(grunt) {
 						standalone: "<%= pkg.name %>"
 					}
 				}
-			}
+			},
+            test: {
+                src: ["test/spec/**/*.js"],
+                dest: "dist/test_bundle.js",
+                options: {
+					bundleOptions: {
+						debug: true,
+						external: ["src/**/*.js"]
+					}
+                }
+            }			
 		},
 		uglify: {
-            all: {
+            main: {
                 files: {
                     "./dist/<%= pkg.name %>.min.js": ["./libs/bluebird-2.2.2-core-progress.js", "./dist/<%= pkg.name %>.js"]
                 }
             }
         },
 		watchify: {
-			options: {
-				standalone: "<%= pkg.name %>",
-				debug: true				
-			},
-			all: {
+			main: {
+				options: {
+					standalone: "<%= pkg.name %>",
+					debug: true				
+				},
 				src: "./src/EVEoj.js",
 				dest: "./dist/<%= pkg.name %>.js"
+			},
+			test: {
+				options: {
+					external: ["src/**/*.js"],
+					debug: true
+				},
+				src: "test/spec/**/*.js",
+				dest: "dist/test_bundle.js"
 			}
-		}
+		},
+		jasmine: {
+            src: "dist/EVEoj.js",
+            options: {
+                specs: "dist/test_bundle.js",
+                vendor: ["libs/jquery-1.11.1.js", "libs/bluebird-2.2.2-core-progress.js"]
+            }
+        }
 	});
  
 	// Load plug-ins
@@ -63,7 +88,7 @@ module.exports = function(grunt) {
 		"jshint",
 		"jasmine_node",
 		"browserify",
-		// "jasmine",
+		"jasmine",
 		"uglify"
 	]);
 };
