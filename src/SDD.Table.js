@@ -152,7 +152,8 @@ function SegLoadDone(tag, data, done, p, ctx) {
 			else if (done.needs == 1) {
 				this.loaded = this.length;
 			}
-		}		
+			this.segments[i].loaded = true;
+		}
 		break;
 	}	
 	if (done.has >= done.needs) p.resolve({context: ctx, table: this});
@@ -193,11 +194,12 @@ P.Load = function(opts) {
 			thenDone = function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.ctx]) };
 			thenFail = function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.ctx]) };
 			for (i = 0; i < all_needs.length; i++) {
-				if (!this.segments[all_needs[i]].p) {
+				segment = this.segments[all_needs[i]];
+				if (!segment.p) {
 					// this segment not pending load
-					this.segments[all_needs[i]].p = this.src.LoadTag(this.segments[i].tag);
+					segment.p = this.src.LoadTag(segment.tag);
 				}
-				this.segments[all_needs[i]].p.then(thenDone, thenFail);
+				segment.p.then(thenDone, thenFail);
 			}
 			return p.promise;
 		}
