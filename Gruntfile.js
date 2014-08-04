@@ -30,7 +30,7 @@ module.exports = function(grunt) {
 				}
 			},
             test: {
-                src: ["test/spec/**/*.js"],
+                src: ["test/spec/*.spec.js"],
                 dest: "dist/test_bundle.js",
                 options: {
 					bundleOptions: {
