@@ -134,7 +134,7 @@ function UnshiftIndexes(data, indexes) {
 		indexes.pop();
 	}
 }
-function SegLoadDone(tag, data, done, p, ctx) {
+function SegLoadDone(tag, data, done, p, ctx, progress) {
 	var i;
 	done.has++;
 	for (i = 0; i < this.segments.length; i++) {
@@ -156,8 +156,8 @@ function SegLoadDone(tag, data, done, p, ctx) {
 		}
 		break;
 	}	
+	if (progress !== null) progress({context: ctx, table: this, has: done.has, needs: done.needs});
 	if (done.has >= done.needs) p.resolve({context: ctx, table: this});
-	else p.progress({context: ctx, table: this, has: done.has, needs: done.needs});
 }
 function SegLoadFail(tag, status, error, p, ctx) {
 	p.reject({context: ctx, table: this, status: status, error: error});
@@ -174,7 +174,11 @@ P.Load = function(opts) {
 		skey,
 		i,
 		segment,
-		o = {ctx: null, key: null},
+		o = {
+			context: null,
+			key: null,
+			progress: null
+		},
 		thenDone,
 		thenFail
 		;
@@ -191,8 +195,8 @@ P.Load = function(opts) {
 		}
 		done = {needs: all_needs.length, has: 0};
 		if (all_needs.length > 0) {
-			thenDone = function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.ctx]) };
-			thenFail = function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.ctx]) };
+			thenDone = function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.context, o.progress]) };
+			thenFail = function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.context]) };
 			for (i = 0; i < all_needs.length; i++) {
 				segment = this.segments[all_needs[i]];
 				if (!segment.p) {
@@ -204,7 +208,7 @@ P.Load = function(opts) {
 			return p.promise;
 		}
 		else {
-			p.resolve({context: o.ctx, table: this});
+			p.resolve({context: o.context, table: this});
 			return p.promise;
 		}	
 	}
@@ -212,7 +216,7 @@ P.Load = function(opts) {
 		// determine which segment the key is in
 		nkey = parseInt(o.key, 10);
 		if (isNaN(nkey)) {
-			p.reject({context: o.ctx, table: this, status: "badkey", error: "invalid key; not numeric"});
+			p.reject({context: o.context, table: this, status: "badkey", error: "invalid key; not numeric"});
 			return this.p.promise;
 		}
 		skey = nkey.toString(10);
@@ -225,14 +229,14 @@ P.Load = function(opts) {
 			}
 		}
 		
-		if (segment === -1) return p.reject({context: o.ctx, table: this, status: "badkey", error: "invalid key; no segment contains it"}).promise;
-		if (segment.loaded) return p.resolve({context: o.ctx, table: this}).promise;
+		if (segment === -1) return p.reject({context: o.context, table: this, status: "badkey", error: "invalid key; no segment contains it"}).promise;
+		if (segment.loaded) return p.resolve({context: o.context, table: this}).promise;
 		
 		if (segment.p === null) segment.p = this.src.LoadTag(segment.tag);
 		done = {needs: 1, has: 0};
 		segment.p.then(
-			function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.ctx]) },
-			function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.ctx]) }
+			function (arg) { SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.context, o.progress]) },
+			function (arg) { SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.context]) }
 		);
 		
 		return p.promise;

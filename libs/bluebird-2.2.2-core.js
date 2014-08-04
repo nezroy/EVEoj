@@ -1,7 +1,7 @@
 /**
  * bluebird build version 2.2.2
- * Features enabled: core, progress
- * Features disabled: race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, cancel, using, filter, any, each, timers
+ * Features enabled: core
+ * Features disabled: race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, progress, cancel, using, filter, any, each, timers
 */
 /**
  * @preserve Copyright (c) 2014 Petka Antonov
@@ -138,7 +138,7 @@ Async.prototype._reset = function Async$_reset() {
 
 module.exports = new Async();
 
-},{"./queue.js":15,"./schedule.js":16,"./util.js":19}],2:[function(_dereq_,module,exports){
+},{"./queue.js":14,"./schedule.js":15,"./util.js":18}],2:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -164,7 +164,7 @@ module.exports = new Async();
 "use strict";
 var Promise = _dereq_("./promise.js")();
 module.exports = Promise;
-},{"./promise.js":12}],3:[function(_dereq_,module,exports){
+},{"./promise.js":11}],3:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -399,7 +399,7 @@ var captureStackTrace = (function stackDetection() {
 return CapturedTrace;
 };
 
-},{"./es5.js":8,"./util.js":19}],4:[function(_dereq_,module,exports){
+},{"./es5.js":8,"./util.js":18}],4:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -495,7 +495,7 @@ CatchFilter.prototype.doFilter = function CatchFilter$_doFilter(e) {
 return CatchFilter;
 };
 
-},{"./errors.js":6,"./es5.js":8,"./util.js":19}],5:[function(_dereq_,module,exports){
+},{"./errors.js":6,"./es5.js":8,"./util.js":18}],5:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -575,7 +575,7 @@ function Promise$thenThrow(reason) {
 };
 };
 
-},{"./util.js":19}],6:[function(_dereq_,module,exports){
+},{"./util.js":18}],6:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -722,7 +722,7 @@ module.exports = {
     canAttach: canAttach
 };
 
-},{"./es5.js":8,"./util.js":19}],7:[function(_dereq_,module,exports){
+},{"./es5.js":8,"./util.js":18}],7:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -973,7 +973,7 @@ Promise.prototype.tap = function Promise$tap(handler) {
 };
 };
 
-},{"./util.js":19}],10:[function(_dereq_,module,exports){
+},{"./util.js":18}],10:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -1097,113 +1097,7 @@ Promise.join = function Promise$Join() {
 
 };
 
-},{"./util.js":19}],11:[function(_dereq_,module,exports){
-/**
- * Copyright (c) 2014 Petka Antonov
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:</p>
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- * 
- */
-"use strict";
-module.exports = function(Promise, PromiseArray) {
-var util = _dereq_("./util.js");
-var async = _dereq_("./async.js");
-var errors = _dereq_("./errors.js");
-var tryCatch1 = util.tryCatch1;
-var errorObj = util.errorObj;
-
-Promise.prototype.progressed = function Promise$progressed(handler) {
-    return this._then(void 0, void 0, handler, void 0, void 0);
-};
-
-Promise.prototype._progress = function Promise$_progress(progressValue) {
-    if (this._isFollowingOrFulfilledOrRejected()) return;
-    this._progressUnchecked(progressValue);
-
-};
-
-Promise.prototype._progressHandlerAt =
-function Promise$_progressHandlerAt(index) {
-    return index === 0
-        ? this._progressHandler0
-        : this[(index << 2) + index - 5 + 2];
-};
-
-Promise.prototype._doProgressWith =
-function Promise$_doProgressWith(progression) {
-    var progressValue = progression.value;
-    var handler = progression.handler;
-    var promise = progression.promise;
-    var receiver = progression.receiver;
-
-    var ret = tryCatch1(handler, receiver, progressValue);
-    if (ret === errorObj) {
-        if (ret.e != null &&
-            ret.e.name !== "StopProgressPropagation") {
-            var trace = errors.canAttach(ret.e)
-                ? ret.e : new Error(ret.e + "");
-            promise._attachExtraTrace(trace);
-            promise._progress(ret.e);
-        }
-    } else if (ret instanceof Promise) {
-        ret._then(promise._progress, null, null, promise, void 0);
-    } else {
-        promise._progress(ret);
-    }
-};
-
-
-Promise.prototype._progressUnchecked =
-function Promise$_progressUnchecked(progressValue) {
-    if (!this.isPending()) return;
-    var len = this._length();
-    var progress = this._progress;
-    for (var i = 0; i < len; i++) {
-        var handler = this._progressHandlerAt(i);
-        var promise = this._promiseAt(i);
-        if (!(promise instanceof Promise)) {
-            var receiver = this._receiverAt(i);
-            if (typeof handler === "function") {
-                handler.call(receiver, progressValue, promise);
-            } else if (receiver instanceof Promise && receiver._isProxied()) {
-                receiver._progressUnchecked(progressValue);
-            } else if (receiver instanceof PromiseArray) {
-                receiver._promiseProgressed(progressValue, promise);
-            }
-            continue;
-        }
-
-        if (typeof handler === "function") {
-            async.invoke(this._doProgressWith, this, {
-                handler: handler,
-                promise: promise,
-                receiver: this._receiverAt(i),
-                value: progressValue
-            });
-        } else {
-            async.invoke(progress, promise, progressValue);
-        }
-    }
-};
-};
-
-},{"./async.js":1,"./errors.js":6,"./util.js":19}],12:[function(_dereq_,module,exports){
+},{"./util.js":18}],11:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2228,14 +2122,13 @@ Promise.AggregateError = errors.AggregateError;
 util.toFastProperties(Promise);
 util.toFastProperties(Promise.prototype);
 Promise.Promise = Promise;
-_dereq_('./progress.js')(Promise,PromiseArray);
 
 Promise.prototype = Promise.prototype;
 return Promise;
 
 };
 
-},{"./async.js":1,"./captured_trace.js":3,"./catch_filter.js":4,"./direct_resolve.js":5,"./errors.js":6,"./errors_api_rejection":7,"./finally.js":9,"./join.js":10,"./progress.js":11,"./promise_array.js":13,"./promise_resolver.js":14,"./synchronous_inspection.js":17,"./thenables.js":18,"./util.js":19}],13:[function(_dereq_,module,exports){
+},{"./async.js":1,"./captured_trace.js":3,"./catch_filter.js":4,"./direct_resolve.js":5,"./errors.js":6,"./errors_api_rejection":7,"./finally.js":9,"./join.js":10,"./promise_array.js":12,"./promise_resolver.js":13,"./synchronous_inspection.js":16,"./thenables.js":17,"./util.js":18}],12:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2439,7 +2332,7 @@ function PromiseArray$getActualLength(len) {
 return PromiseArray;
 };
 
-},{"./errors.js":6,"./util.js":19}],14:[function(_dereq_,module,exports){
+},{"./errors.js":6,"./util.js":18}],13:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2599,7 +2492,7 @@ function PromiseResolver$_setCarriedStackTrace(trace) {
 
 module.exports = PromiseResolver;
 
-},{"./async.js":1,"./errors.js":6,"./es5.js":8,"./util.js":19}],15:[function(_dereq_,module,exports){
+},{"./async.js":1,"./errors.js":6,"./es5.js":8,"./util.js":18}],14:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2716,7 +2609,7 @@ Queue.prototype._resizeTo = function Queue$_resizeTo(capacity) {
 
 module.exports = Queue;
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2779,7 +2672,7 @@ else if (typeof setTimeout !== "undefined") {
 else throw new Error("no async scheduler available");
 module.exports = schedule;
 
-},{}],17:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2857,7 +2750,7 @@ Promise.prototype.isResolved = function Promise$isResolved() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],18:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2992,7 +2885,7 @@ function Promise$_doThenable(x, then, originalPromise) {
 return Promise$_Cast;
 };
 
-},{"./errors.js":6,"./util.js":19}],19:[function(_dereq_,module,exports){
+},{"./errors.js":6,"./util.js":18}],18:[function(_dereq_,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 

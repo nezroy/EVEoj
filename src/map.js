@@ -29,6 +29,8 @@ exports.D = {
 		landmarks: false
 	}
 };
+
+var sys_cache = null; // a place to put generated systems so we don't keep re-creating them
 	
 exports.Create = function(src, type, config) {
 	if (!src || typeof src.HasTable != "function") return null;
@@ -47,31 +49,60 @@ function LoadDone(tbl, ctx) {
 		needs = 0,
 		key
 		;
-	
+
 	for (key in this.tables) {
-		needs++;
+		if (!this.tables.hasOwnProperty(key)) continue;
+		needs += this.tables[key].tbl.segments.length;
 		if (key == tbl.name) this.tables[key].done = true;
-		if (this.tables[key].done) has++;
+		if (this.tables[key].done) {
+			has += this.tables[key].tbl.segments.length;
+		}
 	}
 	
 	if (has >= needs) {
 		LoadInit.apply(this);
 		this.loadingP.resolve({context: ctx, map: this});
 	}
-	else this.loadingP.progress({context: ctx, map: this, has: has, needs: needs});
 }
 function LoadFail(tbl, ctx, status, error) {
 	this.loadingP.reject({context: ctx, map: this, status: status, error: error});
 }
-P.Load = function(ctx) {
+function LoadProgress(arg, progress) {
+	var has = 0,
+		needs = 0,
+		key,
+		i
+		;
+
+	if (progress === null) return;
+	
+	// arg: {context: ctx, table: this, has: done.has, needs: done.needs}
+	// ignoring input progress info and counting finished segments ourself
+	for (key in this.tables) {
+		if (!this.tables.hasOwnProperty(key)) continue;
+		needs += this.tables[key].tbl.segments.length;
+		for (i = 0; i < this.tables[key].tbl.segments.length; i++) {
+			if (this.tables[key].tbl.segments[i].loaded) has++;
+		}
+	}
+	
+	progress({context: arg.context, map: this, has: has, needs: needs});
+}
+P.Load = function(opts) {
 	var self = this,
 		t = this.tables,
 		key,
 		thenDone,
-		thenFail
+		thenFail,
+		progressFunc = null,
+		o = {
+			context: null,
+			progress: null
+		}		
 		;
+	extend(o, opts);
 
-	if (this.loaded) return Utils.deferred().resolve({context: ctx, map: this}).promise;
+	if (this.loaded) return Utils.deferred().resolve({context: o.context, map: this}).promise;
 	if (this.loadingP) return this.loadingP.promise;
 	this.loadingP = Utils.deferred();
 	
@@ -97,11 +128,14 @@ P.Load = function(ctx) {
 
 	thenDone = function (arg) { LoadDone.apply(self, [arg.table, arg.context]) };
 	thenFail = function (arg) { LoadFail.apply(self, [arg.table, arg.context, arg.status, arg.error]) };
+	if (o.progress !== null) {
+		progressFunc = function (arg) { LoadProgress.apply(self, [arg, o.progress]) };
+	}
 	for (key in t) {
 		if (!t.hasOwnProperty(key)) continue;
 		t[key] = {tbl: this.src.GetTable(key), done: false };
-		if (!t[key].tbl) return this.loadingP.reject({context: ctx, map: self, status: "error", error: "source does not contain requested table: " + key}).promise;
-		t[key].tbl.Load().then(thenDone, thenFail);
+		if (!t[key].tbl) return this.loadingP.reject({context: o.context, map: self, status: "error", error: "source does not contain requested table: " + key}).promise;
+		t[key].tbl.Load({context: o.context, progress: progressFunc}).then(thenDone, thenFail);
 	}	
 	
 	return this.loadingP.promise;
@@ -117,11 +151,12 @@ function LoadInit() {
 		jumptbl,
 		sys
 		;
-		
+	
+	sys_cache = {};
 	for (solarSystemID in systbl.data) {
 		if (!systbl.data.hasOwnProperty(solarSystemID)) continue;
 		system = systbl.data[solarSystemID];
-		this.sysNameMap[system[colmap.solarSystemName]] = solarSystemID;
+		this.sysNameMap[system[colmap.solarSystemName]] = parseInt(solarSystemID, 10);
 		this.sysNames.push(system[colmap.solarSystemName]);
 		jumptblnm = false;
 		if (this.space != "W") jumptblnm = "map" + this.space + "SolarSystemJumps";
@@ -145,21 +180,25 @@ function LoadInit() {
 }
 
 P.GetSystem = function (input) {
-	var systemID,
-		system
+	var nSystemID,
+		sSystemID
 		;
 		
 	if (!input) return null;
-	if (input.hasOwnProperty("name") && this.sysNameMap.hasOwnProperty(input.name)) systemID = this.sysNameMap[input.name];
-	else if (input.hasOwnProperty("id")) systemID = input.id;
+	if (input.hasOwnProperty("name") && this.sysNameMap.hasOwnProperty(input.name)) nSystemID = this.sysNameMap[input.name];
+	else if (input.hasOwnProperty("id")) nSystemID = parseInt(input.id, 10);
 	else return null;
+	sSystemID = nSystemID.toString(10);
 	
-	system = System.Create(this.tables["map" + this.space + "SolarSystems"].tbl, systemID);
-	return system;
+	if (!sys_cache.hasOwnProperty(sSystemID)) {
+		sys_cache[sSystemID] = System.Create(this.tables["map" + this.space + "SolarSystems"].tbl, nSystemID);
+	}
+	return sys_cache[sSystemID];
 };
 
 P.GetSystems = function () {
-	return SystemIter.Create(this.tables["map" + this.space + "SolarSystems"].tbl);
+	return SystemIter.Create(this);
+	// this.tables["map" + this.space + "SolarSystems"].tbl);
 };	
 
 P.JumpDist = function (fromID, toID) {
@@ -181,6 +220,8 @@ P.JumpDist = function (fromID, toID) {
 P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 	var route = [],
 		avoids = {},
+		sFromID,
+		sToID,
 		solarSystemID,
 		currentID,
 		systemID,
@@ -196,7 +237,9 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 		dist
 		;
 		
-	if (!this.routeGraph.hasOwnProperty(fromSystemID) || !this.routeGraph.hasOwnProperty(toSystemID)) return route;
+	sFromID = parseInt(fromSystemID, 10).toString(10);
+	sToID = parseInt(toSystemID, 10).toString(10);
+	if (!this.routeGraph.hasOwnProperty(sFromID) || !this.routeGraph.hasOwnProperty(sToID)) return route;
 
 	// reset the route graph
 	for (solarSystemID in this.routeGraph) {
@@ -213,16 +256,16 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 		}
 	}
 	
-	if (fromSystemID == toSystemID) return route;
+	if (sFromID === sToID) return route;
 	
 	// swap from/to to match EVE client?
-	tmp = fromSystemID; fromSystemID = toSystemID; toSystemID = tmp;
+	tmp = sFromID; sFromID = sToID; sToID = tmp;
 	
 	// Dijkstra's to find best route given options provided
-	currentID = fromSystemID;
-	this.routeGraph[fromSystemID].td = 0;	
-	while (!this.routeGraph[toSystemID].visited) {
-		if (currentID != fromSystemID) {
+	currentID = sFromID;
+	this.routeGraph[sFromID].td = 0;	
+	while (!this.routeGraph[sToID].visited) {
+		if (currentID != sFromID) {
 			// find next node to try
 			test_td = -1;
 			testidx = -1;
@@ -243,8 +286,10 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 		for (i = 0; i < this.routeGraph[currentID].jumps.length; i++) {
 			nID = this.routeGraph[currentID].jumps[i];
 			dist = 1;
-			if (avoidLow && this.routeGraph[nID].sec < 0.5 && this.routeGraph[currentID].sec >= 0.5) dist = 1000;
-			if (avoidHi && this.routeGraph[nID].sec >= 0.5 && this.routeGraph[currentID].sec < 0.5) dist = 1000;
+			//if (avoidLow && this.routeGraph[nID].sec < 0.5 && this.routeGraph[currentID].sec >= 0.5) dist = 1000;
+			if (avoidLow && this.routeGraph[nID].sec < 0.5) dist = 1000;
+			//if (avoidHi && this.routeGraph[nID].sec >= 0.5 && this.routeGraph[currentID].sec < 0.5) dist = 1000;
+			if (avoidHi && this.routeGraph[nID].sec >= 0.5) dist = 1000;
 			td = this.routeGraph[currentID].td + dist;
 			if (this.routeGraph[nID].td < 0 || this.routeGraph[nID].td > td) {
 				this.routeGraph[nID].td = td;
@@ -257,12 +302,12 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 	}
 	
 	// get the actual route found
-	prevID = this.routeGraph[toSystemID].prevID;
-	while (prevID != fromSystemID) {
-		route.push(prevID);
+	prevID = this.routeGraph[sToID].prevID;
+	while (prevID != sFromID) {
+		route.push(parseInt(prevID, 10));
 		prevID = this.routeGraph[prevID].prevID;
 	}
-	route.push(fromSystemID);
+	route.push(parseInt(sFromID, 10));
 	// route.reverse();
 	// route.unshift(toSystemID);
 	return route;

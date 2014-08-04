@@ -1,50 +1,87 @@
 "use strict";
 
 var EVEoj = require("../../src/EVEoj.js");
-var Utils = require("../../src/Utils.js");
 
 var SDD;
-var promise;
+var SDD_badpath;
+var promise1;
+var promise2;
 
-var promise_done;
-var promise_fail;
-function promise_wait() {
-	if (promise_done) return true;
+var promise1_done;
+var promise2_done;
+var promise1_fail;
+var promise2_fail;
+function promise1_wait() {
+	if (promise1_done) return true;
 	return false;
 }
-function promise_thenDone() {
-	promise_done = true;
-	promise_fail = false;
+function promise1_thenDone() {
+	promise1_done = true;
+	promise1_fail = false;
 }
-function promise_thenFail() {
-	promise_done = true;
-	promise_fail = true;
+function promise1_thenFail() {
+	promise1_done = true;
+	promise1_fail = true;
+}
+function promise2_wait() {
+	if (promise2_done) return true;
+	return false;
+}
+function promise2_thenDone() {
+	promise2_done = true;
+	promise2_fail = false;
+}
+function promise2_thenFail() {
+	promise2_done = true;
+	promise2_fail = true;
 }
 
-describe("SDD.Table setup", function() {
-	it("loads a valid source", function() {
-		if (Utils.isBrowser) {
+describe("SDD.Source.LoadMeta", function() {
+    it("returns a promise for a bad path", function() {
+		if (EVEoj.Utils.isBrowser) {
+			SDD_badpath = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/fred"});
+		}
+		else {
+			SDD_badpath = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\fred"});
+		}
+		promise1 = SDD_badpath.LoadMeta();
+		expect(promise1).not.toBeNull(null);
+		expect(typeof(promise1.then)).toEqual("function");
+		promise1_done = false;
+		promise1_fail = undefined;
+		promise1.then(promise1_thenDone, promise1_thenFail);
+    });
+    it("returns a promise", function() {
+		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/100370"});
 		}
 		else {
 			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\100370"});
 		}
-		expect(SDD).not.toBeNull(null);
-		promise = SDD.LoadMeta();
-		expect(promise).not.toEqual(null);
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
+		promise2 = SDD.LoadMeta();
+		expect(promise2).not.toEqual(null);
+		expect(typeof(promise2.then)).toEqual("function");
+		promise2_done = false;
+		promise2_fail = undefined;
+		promise2.then(promise2_thenDone, promise2_thenFail);
     });	
 });
 
-describe("SDD.Table setup", function() {
-	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 2500);
+describe("SDD.Source", function() {
+	it("fails asynchronously for a bad path", function() {
+		waitsFor(promise1_wait, 2500);
 		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
+			expect(promise1_done).toEqual(true);
+			expect(promise1_fail).toBeDefined();
+			expect(promise1_fail).toEqual(true);
+		});
+	});
+	it("succeeds asynchronously", function() {
+		waitsFor(promise2_wait, 2500);
+		runs(function() {
+			expect(promise2_done).toEqual(true);
+			expect(promise2_fail).toBeDefined();
+			expect(promise2_fail).toEqual(false);
 		});
 	});
 	it("has valid metainfo", function() {
@@ -52,8 +89,39 @@ describe("SDD.Table setup", function() {
 		expect(SDD.verdesc).toEqual("Crius 1.6");
 		expect(SDD.schema).toEqual(100038);
 	});
+	it("has expected tables", function() {
+		var schema_100038 = [
+			"crpActivities", "crpNPCDivisions", "crpNPCCorporations", "agtAgentTypes", "agtAgents",
+			"chrAncestries", "chrAttributes", "chrBloodlines", "chrFactions", "chrRaces", "chrCertificates",
+			"eveUnits", "dgmAttributeCategories", "dgmAttributeTypes", "dgmEffects", "dgmTypes",
+			"invCategories", "invContrabandTypes", "invControlTowerResourcePurposes", "invControlTowerResources",
+			"invFlags", "invGroups", "invIcons", "invMarketGroups", "invMetaGroups", "invMetaTypes",
+			"invTypeMaterials", "invTypeReactions", "invTypes", "invTypesDesc", "invItems",
+			"mapLandmarks", "mapKRegions", "mapKConstellations", "mapKSolarSystemJumps", "mapKSolarSystems",
+			"mapJRegions", "mapJConstellations", "mapJSolarSystemJumps", "mapJSolarSystems",
+			"mapWRegions", "mapWConstellations", "mapWSolarSystems", "mapRegionJumps",
+			"mapConstellationJumps", "mapJumps", "warCombatZoneSystems", "warCombatZones",
+			"mapKCelestials", "mapKCelestialStatistics", "mapKPlanets", "mapKBelts", "mapKMoons",
+			"mapKGates", "mapJCelestials", "mapJCelestialStatistics", "mapJPlanets", "mapJBelts",
+			"mapJMoons", "mapJGates", "mapWCelestials", "mapWCelestialStatistics", "mapWPlanets",
+			"mapWMoons", "ramActivities", "ramAssemblyLineStations", "ramAssemblyLineTypes",
+			"ramInstallationTypeContents", "ramBlueprints", "staServices", "staOperations",
+			"staStationTypes", "staStations"
+			];
+		var table_list = SDD.GetTables();
+		expect(table_list).toEqual(schema_100038);
+	});
+	it("returns null for invalid tables", function() {
+		expect(SDD.GetTable("potato")).toBeNull();
+	});
+	it("returns valid tables", function() {
+		var table = SDD.GetTable("invTypes");
+		expect(table).not.toBeNull();
+		expect(EVEoj.SDD.Table.P.isPrototypeOf(table)).toEqual(true);
+	});
 });
 
+/*
 describe("SDD.Table pre-load", function() {
 	var table;
 	
@@ -83,12 +151,12 @@ describe("SDD.Table pre-load", function() {
 
 describe("SDD.Table.Load", function() {
     it("returns a promise", function() {
-		promise = SDD.GetTable("invTypes").Load();
-		expect(promise).not.toBeNull(null);
-		expect(typeof(promise.then)).toEqual("function");
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
+		promise1 = SDD.GetTable("invTypes").Load();
+		expect(promise1).not.toBeNull(null);
+		expect(typeof(promise1.then)).toEqual("function");
+		promise1_done = false;
+		promise1_fail = undefined;
+		promise1.then(promise1_thenDone, promise1_thenFail);
     });
 });
 
@@ -100,11 +168,11 @@ describe("SDD.Table", function() {
 	});
 
 	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 2500);
+		waitsFor(promise1_wait, 2500);
 		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
+			expect(promise1_done).toEqual(true);
+			expect(promise1_fail).toBeDefined();
+			expect(promise1_fail).toEqual(false);
 		});
 	});
 	it("has expected data", function() {
@@ -150,12 +218,12 @@ describe("SDD.Table.Load partial", function() {
     it("returns a promise", function() {
 		var table = SDD.GetTable("invTypesDesc");
 		expect(table.segments.length).toEqual(3);
-		promise = table.Load({key: 37});
-		expect(promise).not.toBeNull(null);
-		expect(typeof(promise.then)).toEqual("function");
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
+		promise1 = table.Load({key: 37});
+		expect(promise1).not.toBeNull(null);
+		expect(typeof(promise1.then)).toEqual("function");
+		promise1_done = false;
+		promise1_fail = undefined;
+		promise1.then(promise1_thenDone, promise1_thenFail);
     });
 });
 
@@ -167,11 +235,11 @@ describe("SDD.Table partial", function() {
 	});
 
 	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 2500);
+		waitsFor(promise1_wait, 2500);
 		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
+			expect(promise1_done).toEqual(true);
+			expect(promise1_fail).toBeDefined();
+			expect(promise1_fail).toEqual(false);
 		});
 	});
 	it("has expected data", function() {
@@ -216,12 +284,12 @@ describe("SDD.Table.Load remaining", function() {
     it("returns a promise", function() {
 		var table = SDD.GetTable("invTypesDesc");
 		expect(table.segments.length).toEqual(3);
-		promise = table.Load();
-		expect(promise).not.toBeNull(null);
-		expect(typeof(promise.then)).toEqual("function");
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
+		promise1 = table.Load();
+		expect(promise1).not.toBeNull(null);
+		expect(typeof(promise1.then)).toEqual("function");
+		promise1_done = false;
+		promise1_fail = undefined;
+		promise1.then(promise1_thenDone, promise1_thenFail);
     });
 });
 
@@ -233,11 +301,11 @@ describe("SDD.Table remaining", function() {
 	});
 
 	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 2500);
+		waitsFor(promise1_wait, 2500);
 		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
+			expect(promise1_done).toEqual(true);
+			expect(promise1_fail).toBeDefined();
+			expect(promise1_fail).toEqual(false);
 		});
 	});
 	it("has expected data", function() {
@@ -249,6 +317,8 @@ describe("SDD.Table remaining", function() {
 	});
 	it("returns null for non-existent entries", function() {
 		expect(table.GetEntry(1)).toBeNull();
+	});
+	it("returns false for still unknown entries", function() {
 	});
 	it("returns row for valid entries", function() {
 		var row1 = table.GetEntry("37");
@@ -269,3 +339,4 @@ describe("SDD.Table remaining", function() {
 		expect(row4).not.toBe(false);
 	});
 });
+*/

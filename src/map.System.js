@@ -33,16 +33,19 @@ exports.D = {
 exports.Create = function (tbl, ID) {	
 	var obj,
 		sys,
-		col
+		col,
+		nID
 		;
 		
-	sys = tbl.GetEntry(ID);
+	nID = parseInt(ID, 10);
+		
+	sys = tbl.GetEntry(nID);
 	if (!sys) return null;
 	obj = Utils.create(P);
 	extend(true, obj, exports.D);
 	col = tbl.colmap;
 	
-	obj.ID = ID;
+	obj.ID = nID;
 	obj.name = sys[col.solarSystemName];
 	obj.regionID = sys[col.regionId];
 	obj.constellationID = sys[col.constellationID];
@@ -59,7 +62,7 @@ exports.Create = function (tbl, ID) {
 	obj.constellation = sys[col.constellation];
 	obj.contiguous = sys[col.contiguous];
 	obj.security = sys[col.security];
-	obj.sec = obj.security.toFixed(1);
+	obj.sec = (obj.security > 0) ? obj.security.toFixed(1) : "0.0";
 	obj.factionID = (sys[col.factionID] !== 0) ? sys[col.factionID] : null;
 	obj.radius = sys[col.radius];
 	obj.sunTypeID = sys[col.sunTypeID];

@@ -2,23 +2,24 @@
 
 var extend = require("node.extend");
 var Utils = require("./Utils.js");
-var System = require("./map.System.js");
 
 var P = exports.P = {}; // public methods
 exports.D = {
 	// default object properties
 	curidx: 0,
-	tbl: null,
+	map: null,
 	keyset: []
 };
-exports.Create = function (tbl) {
+exports.Create = function (map) {
 	var obj,
-		key
+		key,
+		tbl
 		;
 
 	obj = Utils.create(P);
 	extend(true, obj, exports.D);
-	obj.tbl = tbl;
+	obj.map = map;
+	tbl = map.tables["map" + map.space + "SolarSystems"].tbl;
 	
 	for (key in tbl.data) {
 		if (!tbl.data.hasOwnProperty(key)) continue;
@@ -33,5 +34,5 @@ P.HasNext = function () {
 };
 
 P.Next = function () {
-	return System.Create(this.tbl, this.keyset[this.curidx++]);
+	return this.map.GetSystem({id: this.keyset[this.curidx++]});
 };

@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 		uglify: {
             main: {
                 files: {
-                    "./dist/<%= pkg.name %>.min.js": ["./libs/bluebird-2.2.2-core-progress.js", "./dist/<%= pkg.name %>.js"]
+                    "./dist/<%= pkg.name %>.min.js": ["./libs/bluebird-2.2.2-core.js", "./dist/<%= pkg.name %>.js"]
                 }
             }
         },
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
             src: "dist/EVEoj.js",
             options: {
                 specs: "dist/test_bundle.js",
-                vendor: ["libs/jquery-1.11.1.js", "libs/bluebird-2.2.2-core-progress.js"]
+                vendor: ["libs/jquery-1.11.1.js", "libs/bluebird-2.2.2-core.js"]
             }
         }
 	});
