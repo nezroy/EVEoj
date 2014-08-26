@@ -64,10 +64,10 @@ var jita_dodixie_low = [
 describe("map setup", function() {
 	it("loads a valid source", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/100370"});
+			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/101505"});
 		}
 		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\100370"});
+			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\101505"});
 		}
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
@@ -88,8 +88,8 @@ describe("map setup", function() {
 		});
 	});
 	it("has valid metainfo", function() {
-		expect(SDD.version).toEqual(100370);
-		expect(SDD.verdesc).toEqual("Crius 1.6");
+		expect(SDD.version).toEqual(101505);
+		expect(SDD.verdesc).toEqual("Hyperion 1.0");
 		expect(SDD.schema).toEqual(100038);
 	});
 });
