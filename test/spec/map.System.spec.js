@@ -24,10 +24,10 @@ function promise_thenFail() {
 describe("map.System setup", function() {
 	it("loads a valid source", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/100370"});
+			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/105658"});
 		}
 		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\100370"});
+			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\105658"});
 		}
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
@@ -48,8 +48,8 @@ describe("map.System setup", function() {
 		});
 	});
 	it("has valid metainfo", function() {
-		expect(SDD.version).toEqual(100370);
-		expect(SDD.verdesc).toEqual("Crius 1.6");
+		expect(SDD.version).toEqual(105658);
+		expect(SDD.verdesc).toEqual("Oceanus 1.0");
 		expect(SDD.schema).toEqual(100038);
 	});
 	it("returns a new object for a valid type", function() {

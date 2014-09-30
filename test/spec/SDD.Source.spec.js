@@ -53,10 +53,10 @@ describe("SDD.Source.LoadMeta", function() {
     });
     it("returns a promise", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/101505"});
+			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/105658"});
 		}
 		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\101505"});
+			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\105658"});
 		}
 		promise2 = SDD.LoadMeta();
 		expect(promise2).not.toEqual(null);
@@ -85,8 +85,8 @@ describe("SDD.Source", function() {
 		});
 	});
 	it("has valid metainfo", function() {
-		expect(SDD.version).toEqual(101505);
-		expect(SDD.verdesc).toEqual("Hyperion 1.0");
+		expect(SDD.version).toEqual(105658);
+		expect(SDD.verdesc).toEqual("Oceanus 1.0");
 		expect(SDD.schema).toEqual(100038);
 	});
 	it("has expected tables", function() {

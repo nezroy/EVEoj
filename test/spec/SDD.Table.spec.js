@@ -27,10 +27,10 @@ function progress_track() {
 describe("SDD.Table setup", function() {
 	it("loads a valid source", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/101505"});
+			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/105658"});
 		}
 		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\101505"});
+			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\105658"});
 		}
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
@@ -51,8 +51,8 @@ describe("SDD.Table setup", function() {
 		});
 	});
 	it("has valid metainfo", function() {
-		expect(SDD.version).toEqual(101505);
-		expect(SDD.verdesc).toEqual("Hyperion 1.0");
+		expect(SDD.version).toEqual(105658);
+		expect(SDD.verdesc).toEqual("Oceanus 1.0");
 		expect(SDD.schema).toEqual(100038);
 	});
 });
@@ -112,7 +112,7 @@ describe("SDD.Table", function() {
 	});
 	it("has expected data", function() {
 		expect(table.length).toEqual(table.loaded);
-		expect(table.length).toEqual(21911);
+		expect(table.length).toEqual(21975);
 	});
 	it("returns null for non-existent entries", function() {
 		expect(table.GetEntry(60000000)).toBeNull();
@@ -183,7 +183,7 @@ describe("SDD.Table partial", function() {
 	});
 	it("has expected data", function() {
 		expect(table.loaded).toEqual(7500);
-		expect(table.length).toEqual(21911);
+		expect(table.length).toEqual(21975);
 		expect(table.segments[0].loaded).toEqual(true);
 		expect(table.segments[1].loaded).toEqual(false);
 	});
@@ -253,7 +253,7 @@ describe("SDD.Table remaining", function() {
 	});	
 	it("has expected data", function() {
 		expect(table.loaded).toEqual(table.length);
-		expect(table.length).toEqual(21911);
+		expect(table.length).toEqual(21975);
 		expect(table.segments[0].loaded).toEqual(true);
 		expect(table.segments[1].loaded).toEqual(true);
 		expect(table.segments[2].loaded).toEqual(true);
