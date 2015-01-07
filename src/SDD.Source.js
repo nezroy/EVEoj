@@ -18,23 +18,22 @@ P.LoadMeta = function() {
 	return null;
 };
 
-P.HasTable = function (tbl) {
+P.HasTable = function(tbl) {
 	return this.tables.hasOwnProperty(tbl);
 };
 
-P.GetTables = function () {
+P.GetTables = function() {
 	var tbl_list = [],
-		tbl
-		;
+		tbl;
 	for (tbl in this.tables) {
 		if (!this.tables.hasOwnProperty(tbl)) continue;
 		tbl_list.push(tbl);
 	}
-	
+
 	return tbl_list;
 };
 
-P.GetTable = function (tbl) {
+P.GetTable = function(tbl) {
 	if (!tbl || !this.tables.hasOwnProperty(tbl)) return null;
 	return this.tables[tbl];
 };

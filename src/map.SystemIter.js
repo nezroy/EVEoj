@@ -10,29 +10,30 @@ exports.D = {
 	map: null,
 	keyset: []
 };
-exports.Create = function (map) {
+exports.Create = function(map) {
 	var obj,
 		key,
-		tbl
-		;
+		tbl;
 
 	obj = Utils.create(P);
 	extend(true, obj, exports.D);
 	obj.map = map;
 	tbl = map.tables["map" + map.space + "SolarSystems"].tbl;
-	
+
 	for (key in tbl.data) {
 		if (!tbl.data.hasOwnProperty(key)) continue;
 		obj.keyset.push(key);
 	}
-	
-	return obj;	
+
+	return obj;
 };
 
-P.HasNext = function () {
+P.HasNext = function() {
 	if (this.curidx < this.keyset.length) return true;
 };
 
-P.Next = function () {
-	return this.map.GetSystem({id: this.keyset[this.curidx++]});
+P.Next = function() {
+	return this.map.GetSystem({
+		id: this.keyset[this.curidx++]
+	});
 };

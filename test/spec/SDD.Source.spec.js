@@ -11,38 +11,47 @@ var promise1_done;
 var promise2_done;
 var promise1_fail;
 var promise2_fail;
+
 function promise1_wait() {
 	if (promise1_done) return true;
 	return false;
 }
+
 function promise1_thenDone() {
 	promise1_done = true;
 	promise1_fail = false;
 }
+
 function promise1_thenFail() {
 	promise1_done = true;
 	promise1_fail = true;
 }
+
 function promise2_wait() {
 	if (promise2_done) return true;
 	return false;
 }
+
 function promise2_thenDone() {
 	promise2_done = true;
 	promise2_fail = false;
 }
+
 function promise2_thenFail() {
 	promise2_done = true;
 	promise2_fail = true;
 }
 
 describe("SDD.Source.LoadMeta", function() {
-    it("returns a promise for a bad path", function() {
+	it("returns a promise for a bad path", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD_badpath = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/fred"});
-		}
-		else {
-			SDD_badpath = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\fred"});
+			SDD_badpath = EVEoj.SDD.Create("json", {
+				path: "http://eve-oj.dev/sdd/fred"
+			});
+		} else {
+			SDD_badpath = EVEoj.SDD.Create("json", {
+				path: "D:\\projects\\xyjax\\static\\sdd\\fred"
+			});
 		}
 		promise1 = SDD_badpath.LoadMeta();
 		expect(promise1).not.toBeNull(null);
@@ -50,13 +59,16 @@ describe("SDD.Source.LoadMeta", function() {
 		promise1_done = false;
 		promise1_fail = undefined;
 		promise1.then(promise1_thenDone, promise1_thenFail);
-    });
-    it("returns a promise", function() {
+	});
+	it("returns a promise", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/105658"});
-		}
-		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\105658"});
+			SDD = EVEoj.SDD.Create("json", {
+				path: "http://eve-oj.dev/sdd/105658"
+			});
+		} else {
+			SDD = EVEoj.SDD.Create("json", {
+				path: "D:\\projects\\xyjax\\static\\sdd\\105658"
+			});
 		}
 		promise2 = SDD.LoadMeta();
 		expect(promise2).not.toEqual(null);
@@ -64,7 +76,7 @@ describe("SDD.Source.LoadMeta", function() {
 		promise2_done = false;
 		promise2_fail = undefined;
 		promise2.then(promise2_thenDone, promise2_thenFail);
-    });	
+	});
 });
 
 describe("SDD.Source", function() {
@@ -107,7 +119,7 @@ describe("SDD.Source", function() {
 			"mapWMoons", "ramActivities", "ramAssemblyLineStations", "ramAssemblyLineTypes",
 			"ramInstallationTypeContents", "ramBlueprints", "staServices", "staOperations",
 			"staStationTypes", "staStations"
-			];
+		];
 		var table_list = SDD.GetTables();
 		expect(table_list).toEqual(schema_100038);
 	});

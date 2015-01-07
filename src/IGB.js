@@ -10,16 +10,15 @@ function IGBClick(ev) {
 		cctype,
 		trustme,
 		trust_req = false,
-		href
-		;
-	
+		href;
+
 	href = $(this).attr("href");
 	if (!href.match(/^eve:/i)) return; // huh.. that's odd
-	ev.preventDefault();		
+	ev.preventDefault();
 
 	if (href.match(/^eve:trust:/i)) trust_req = true;
 	href = href.replace(/^eve:\s*/i, "").replace(/^trust:\s*/i, "");
-	
+
 	/*
 	if (typeof(navigator) != 'undefined' && navigator.hasOwnProperty('userAgent') && !navigator.userAgent.match(/EVE\-IGB/)) {
 		// straight browser detection for IGB
@@ -30,7 +29,7 @@ function IGBClick(ev) {
 		// impl based detection for IGB
 		return;
 	}
-	
+
 	corp_id = $(this).data("igb-corpid");
 	chan = $(this).data("igb-chan");
 	cctype = $(this).data("igb-cctype");
@@ -39,9 +38,9 @@ function IGBClick(ev) {
 	if (corp_id && corp_id > 0) CCPEVE.showInfo(2, corp_id);
 	if (chan) CCPEVE.joinChannel(chan);
 	if (cctype) CCPEVE.createContract(cctype);
-	if (trustme) CCPEVE.requestTrust(trustme);	
+	if (trustme) CCPEVE.requestTrust(trustme);
 }
 
-$(function () {
+$(function() {
 	$("a[href^='eve:']").click(IGBClick);
-});	
+});

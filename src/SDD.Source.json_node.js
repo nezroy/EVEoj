@@ -5,7 +5,7 @@ var Source = require("./SDD.Source.js");
 var Table = require("./SDD.Table.js");
 var Utils = require("./Utils.js");
 var fs = require("fs");
-		
+
 var P = exports.P = Utils.create(Source.P); // public methods, inherit from base Source class
 
 exports.D = extend(true, {}, Source.D, {
@@ -30,10 +30,30 @@ function MetainfDone(data, status, jqxhr, p, ctx) {
 		newt,
 		i;
 
-	if (!data) return p.reject({context: ctx, source: this, status: "error", error: "invalid data object"});
-	if (!data.hasOwnProperty("formatID") || data.formatID != "1") return p.reject({context: ctx, source: this, status: "error", error: "unknown data format"});
-	if (!data.hasOwnProperty("schema") || !data.hasOwnProperty("version")) return p.reject({context: ctx, source: this, status:"error", error: "data has no version information"});
-	if (!data.hasOwnProperty("tables") || !data.hasOwnProperty("tables")) return p.reject({context: ctx, source: this, status: "error", error: "data has no table information"});
+	if (!data) return p.reject({
+		context: ctx,
+		source: this,
+		status: "error",
+		error: "invalid data object"
+	});
+	if (!data.hasOwnProperty("formatID") || data.formatID != "1") return p.reject({
+		context: ctx,
+		source: this,
+		status: "error",
+		error: "unknown data format"
+	});
+	if (!data.hasOwnProperty("schema") || !data.hasOwnProperty("version")) return p.reject({
+		context: ctx,
+		source: this,
+		status: "error",
+		error: "data has no version information"
+	});
+	if (!data.hasOwnProperty("tables") || !data.hasOwnProperty("tables")) return p.reject({
+		context: ctx,
+		source: this,
+		status: "error",
+		error: "data has no table information"
+	});
 	this.version = data.version;
 	this.schema = data.schema;
 	if (data.hasOwnProperty("verdesc")) this.verdesc = data.verdesc;
@@ -41,56 +61,70 @@ function MetainfDone(data, status, jqxhr, p, ctx) {
 	// reset stuff
 	this.tables = {};
 	this.jsonfiles = {};
-	
+
 	for (tbl in data.tables) {
 		if (!data.tables.hasOwnProperty(tbl)) continue;
-		
+
 		// create a new table from our metadata
 		newt = Table.Create(tbl, this, data.tables[tbl]);
 		this.tables[newt.name] = newt;
-		
+
 		// collect a list of json sources
 		for (i = 0; i < newt.segments.length; i++) {
 			if (this.jsonfiles.hasOwnProperty(newt.segments[i].tag)) continue;
-			this.jsonfiles[newt.segments[i].tag] = {loaded: false, p: null};
+			this.jsonfiles[newt.segments[i].tag] = {
+				loaded: false,
+				p: null
+			};
 		}
 	}
-	
-	p.resolve({context: ctx, source: this});
+
+	p.resolve({
+		context: ctx,
+		source: this
+	});
 }
 
 function MetainfFail(jqxhr, status, error, p, ctx) {
-	p.reject({context: ctx, source: this, status: status, error: error});
+	p.reject({
+		context: ctx,
+		source: this,
+		status: status,
+		error: error
+	});
 }
 
 P.LoadMeta = function(ctx) {
 	var self = this,
-		p = Utils.deferred()
-		;
-		
+		p = Utils.deferred();
+
 	if (!this.cfg.hasOwnProperty("path") || typeof this.cfg.path != "string") {
-		return p.reject({context: ctx, source: this, status: "error", error: "path is required"}).promise;
+		return p.reject({
+			context: ctx,
+			source: this,
+			status: "error",
+			error: "path is required"
+		}).promise;
 	}
 
-	fs.readFile(this.cfg.path + "/metainf.json", "utf8", function (err, contents) {
+	fs.readFile(this.cfg.path + "/metainf.json", "utf8", function(err, contents) {
 		var data;
-			
+
 		if (err) {
 			MetainfFail.apply(self, [null, "error", err, p, ctx]);
 			return;
 		}
-		
+
 		try {
 			data = JSON.parse(contents);
-		}
-		catch (err) {
+		} catch (err) {
 			MetainfFail.apply(self, [null, "error", err, p, ctx]);
 			return;
 		}
-		
+
 		MetainfDone.apply(self, [data, null, null, p, ctx]);
 	});
-	
+
 	/*
 	
 	Utils.ajax({
@@ -105,56 +139,74 @@ P.LoadMeta = function(ctx) {
 		function (jqxhr, status, error) { MetainfFail.apply(self, [jqxhr, status, error, p, ctx]) }
 	);
 	*/
-	
+
 	return p.promise;
 };
 
 function LoadFileDone(ctx, jsf, data) {
 	if (!data || !data.hasOwnProperty("tables")) {
-		this.jsonfiles[jsf].p.reject({context: ctx, tag: jsf, status: "error", error: "invalid data object"});
-	}
-	else if (!data.hasOwnProperty("formatID") || data.formatID != "1") {
-		this.jsonfiles[jsf].p.reject({context: ctx, tag: jsf, status: "error", error: "unknown data format"});
-	}
-	else {
+		this.jsonfiles[jsf].p.reject({
+			context: ctx,
+			tag: jsf,
+			status: "error",
+			error: "invalid data object"
+		});
+	} else if (!data.hasOwnProperty("formatID") || data.formatID != "1") {
+		this.jsonfiles[jsf].p.reject({
+			context: ctx,
+			tag: jsf,
+			status: "error",
+			error: "unknown data format"
+		});
+	} else {
 		this.jsonfiles[jsf].loaded = true;
 		this.jsonfiles[jsf].data = data;
-		this.jsonfiles[jsf].p.resolve({context: ctx, tag: jsf, data: data});
+		this.jsonfiles[jsf].p.resolve({
+			context: ctx,
+			tag: jsf,
+			data: data
+		});
 	}
 }
+
 function LoadFileFail(ctx, jsf, status, error) {
-	this.jsonfiles[jsf].p.reject({context: ctx, tag: jsf, status: status, error: error});
+	this.jsonfiles[jsf].p.reject({
+		context: ctx,
+		tag: jsf,
+		status: status,
+		error: error
+	});
 }
 P.LoadTag = function(jsf, ctx) {
 	var self = this;
 	if (this.jsonfiles[jsf].loaded) {
-		return Utils.deferred().resolve({tag: jsf, data: this.jsonfiles[jsf].data}).promise;
-	}
-	else if (this.jsonfiles[jsf].p !== null) {
+		return Utils.deferred().resolve({
+			tag: jsf,
+			data: this.jsonfiles[jsf].data
+		}).promise;
+	} else if (this.jsonfiles[jsf].p !== null) {
 		return this.jsonfiles[jsf].p.promise;
-	}
-	else {
+	} else {
 		this.jsonfiles[jsf].p = Utils.deferred();
-		
-		fs.readFile(this.cfg.path + "/" + jsf + ".json", "utf8", function (err, contents) {
+
+		fs.readFile(this.cfg.path + "/" + jsf + ".json", "utf8", function(err, contents) {
 			var data;
-			
+
 			if (err) {
 				LoadFileFail.apply(self, [ctx, jsf, "error", err]);
 				return;
 			}
-			
+
 			try {
 				data = JSON.parse(contents);
-			}
-			catch (err) {
+			} catch (err) {
 				LoadFileFail.apply(self, [ctx, jsf, "error", err]);
 				return;
 			}
 
 			LoadFileDone.apply(self, [ctx, jsf, data]);
 		});
-		
+
 		/*
 		Utils.ajax({
 			dataType: this.cfg.datatype,
@@ -168,7 +220,7 @@ P.LoadTag = function(jsf, ctx) {
 			function (jqxhr, status, error) { LoadFileFail.apply(self, [ctx, jsf, status, error]) }
 		);
 		*/
-		
-		return this.jsonfiles[jsf].p.promise;		
-	}	
+
+		return this.jsonfiles[jsf].p.promise;
+	}
 };

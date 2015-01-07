@@ -7,7 +7,7 @@ var System = require("./map.System.js");
 var SystemIter = require("./map.SystemIter.js");
 
 var P = exports.P = {}; // public methods for this class
-	
+
 exports.D = {
 	// default properties for new instances
 	src: null,
@@ -31,7 +31,7 @@ exports.D = {
 };
 
 var sys_cache = null; // a place to put generated systems so we don't keep re-creating them
-	
+
 exports.Create = function(src, type, config) {
 	if (!src || typeof src.HasTable != "function") return null;
 	if (type != "J" && type != "K" && type != "W") return null;
@@ -40,15 +40,14 @@ exports.Create = function(src, type, config) {
 	if (config) extend(true, obj.c, config);
 	obj.src = src;
 	obj.space = type;
-	
+
 	return obj;
 };
 
 function LoadDone(tbl, ctx) {
 	var has = 0,
 		needs = 0,
-		key
-		;
+		key;
 
 	for (key in this.tables) {
 		if (!this.tables.hasOwnProperty(key)) continue;
@@ -58,24 +57,33 @@ function LoadDone(tbl, ctx) {
 			has += this.tables[key].tbl.segments.length;
 		}
 	}
-	
+
 	if (has >= needs) {
 		LoadInit.apply(this);
-		this.loadingP.resolve({context: ctx, map: this});
+		this.loadingP.resolve({
+			context: ctx,
+			map: this
+		});
 	}
 }
+
 function LoadFail(tbl, ctx, status, error) {
-	this.loadingP.reject({context: ctx, map: this, status: status, error: error});
+	this.loadingP.reject({
+		context: ctx,
+		map: this,
+		status: status,
+		error: error
+	});
 }
+
 function LoadProgress(arg, progress) {
 	var has = 0,
 		needs = 0,
 		key,
-		i
-		;
+		i;
 
 	if (progress === null) return;
-	
+
 	// arg: {context: ctx, table: this, has: done.has, needs: done.needs}
 	// ignoring input progress info and counting finished segments ourself
 	for (key in this.tables) {
@@ -85,8 +93,13 @@ function LoadProgress(arg, progress) {
 			if (this.tables[key].tbl.segments[i].loaded) has++;
 		}
 	}
-	
-	progress({context: arg.context, map: this, has: has, needs: needs});
+
+	progress({
+		context: arg.context,
+		map: this,
+		has: has,
+		needs: needs
+	});
 }
 P.Load = function(opts) {
 	var self = this,
@@ -98,14 +111,16 @@ P.Load = function(opts) {
 		o = {
 			context: null,
 			progress: null
-		}		
-		;
+		};
 	extend(o, opts);
 
-	if (this.loaded) return Utils.deferred().resolve({context: o.context, map: this}).promise;
+	if (this.loaded) return Utils.deferred().resolve({
+		context: o.context,
+		map: this
+	}).promise;
 	if (this.loadingP) return this.loadingP.promise;
 	this.loadingP = Utils.deferred();
-	
+
 	// setup required and optional tables
 	t["map" + this.space + "Regions"] = false;
 	t["map" + this.space + "Constellations"] = false;
@@ -118,7 +133,7 @@ P.Load = function(opts) {
 			t.mapJumps = false;
 		}
 		if (this.c.belts) t["map" + this.space + "Belts"] = false;
-		if (this.c.gates) t["map" + this.space + "Gates"] = false;		
+		if (this.c.gates) t["map" + this.space + "Gates"] = false;
 		if (this.c.landmarks) t.mapLandmarks = false;
 	}
 	if (this.c.planets) t["map" + this.space + "Planets"] = false;
@@ -126,18 +141,35 @@ P.Load = function(opts) {
 	if (this.c.celestials) t["map" + this.space + "Celestials"] = false;
 	if (this.c.statistics) t["map" + this.space + "CelestialStatistics"] = false;
 
-	thenDone = function (arg) { LoadDone.apply(self, [arg.table, arg.context]) };
-	thenFail = function (arg) { LoadFail.apply(self, [arg.table, arg.context, arg.status, arg.error]) };
+	thenDone = function(arg) {
+		LoadDone.apply(self, [arg.table, arg.context]);
+	};
+	thenFail = function(arg) {
+		LoadFail.apply(self, [arg.table, arg.context, arg.status, arg.error]);
+	};
 	if (o.progress !== null) {
-		progressFunc = function (arg) { LoadProgress.apply(self, [arg, o.progress]) };
+		progressFunc = function(arg) {
+			LoadProgress.apply(self, [arg, o.progress]);
+		};
 	}
 	for (key in t) {
 		if (!t.hasOwnProperty(key)) continue;
-		t[key] = {tbl: this.src.GetTable(key), done: false };
-		if (!t[key].tbl) return this.loadingP.reject({context: o.context, map: self, status: "error", error: "source does not contain requested table: " + key}).promise;
-		t[key].tbl.Load({context: o.context, progress: progressFunc}).then(thenDone, thenFail);
-	}	
-	
+		t[key] = {
+			tbl: this.src.GetTable(key),
+			done: false
+		};
+		if (!t[key].tbl) return this.loadingP.reject({
+			context: o.context,
+			map: self,
+			status: "error",
+			error: "source does not contain requested table: " + key
+		}).promise;
+		t[key].tbl.Load({
+			context: o.context,
+			progress: progressFunc
+		}).then(thenDone, thenFail);
+	}
+
 	return this.loadingP.promise;
 };
 
@@ -149,9 +181,8 @@ function LoadInit() {
 		system,
 		jumptblnm,
 		jumptbl,
-		sys
-		;
-	
+		sys;
+
 	sys_cache = {};
 	for (solarSystemID in systbl.data) {
 		if (!systbl.data.hasOwnProperty(solarSystemID)) continue;
@@ -179,45 +210,43 @@ function LoadInit() {
 	this.sysNames.sort();
 }
 
-P.GetSystem = function (input) {
+P.GetSystem = function(input) {
 	var nSystemID,
-		sSystemID
-		;
-		
+		sSystemID;
+
 	if (!input) return null;
 	if (input.hasOwnProperty("name") && this.sysNameMap.hasOwnProperty(input.name)) nSystemID = this.sysNameMap[input.name];
 	else if (input.hasOwnProperty("id")) nSystemID = parseInt(input.id, 10);
 	else return null;
 	sSystemID = nSystemID.toString(10);
-	
+
 	if (!sys_cache.hasOwnProperty(sSystemID)) {
 		sys_cache[sSystemID] = System.Create(this.tables["map" + this.space + "SolarSystems"].tbl, nSystemID);
 	}
 	return sys_cache[sSystemID];
 };
 
-P.GetSystems = function () {
+P.GetSystems = function() {
 	return SystemIter.Create(this);
 	// this.tables["map" + this.space + "SolarSystems"].tbl);
-};	
+};
 
-P.JumpDist = function (fromID, toID) {
+P.JumpDist = function(fromID, toID) {
 	var systbl = this.tables["map" + this.space + "SolarSystems"].tbl,
 		colmap = systbl.colmap,
 		x1 = systbl.data[fromID][colmap.x],
-		x2 = systbl.data[toID][colmap.x],			
+		x2 = systbl.data[toID][colmap.x],
 		y1 = systbl.data[fromID][colmap.y],
 		y2 = systbl.data[toID][colmap.y],
 		z1 = systbl.data[fromID][colmap.z],
 		z2 = systbl.data[toID][colmap.z],
-		dist
-		;
-			
+		dist;
+
 	dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
-	return dist/Const.M_per_LY;
+	return dist / Const.M_per_LY;
 };
 
-P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
+P.Route = function(fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 	var route = [],
 		avoids = {},
 		sFromID,
@@ -234,9 +263,8 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 		testset = [],
 		test_td,
 		testidx,
-		dist
-		;
-		
+		dist;
+
 	sFromID = parseInt(fromSystemID, 10).toString(10);
 	sToID = parseInt(toSystemID, 10).toString(10);
 	if (!this.routeGraph.hasOwnProperty(sFromID) || !this.routeGraph.hasOwnProperty(sToID)) return route;
@@ -248,22 +276,24 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 		this.routeGraph[solarSystemID].prevID = -1;
 		this.routeGraph[solarSystemID].visited = false;
 	}
-	
+
 	// populate avoid list lookup table
 	if (avoidList && avoidList.length > 0) {
 		for (i = 0; i < avoidList.length; i++) {
 			avoids[avoidList[i]] = true;
 		}
 	}
-	
+
 	if (sFromID === sToID) return route;
-	
+
 	// swap from/to to match EVE client?
-	tmp = sFromID; sFromID = sToID; sToID = tmp;
-	
+	tmp = sFromID;
+	sFromID = sToID;
+	sToID = tmp;
+
 	// Dijkstra's to find best route given options provided
 	currentID = sFromID;
-	this.routeGraph[sFromID].td = 0;	
+	this.routeGraph[sFromID].td = 0;
 	while (!this.routeGraph[sToID].visited) {
 		if (currentID != sFromID) {
 			// find next node to try
@@ -295,12 +325,12 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 				this.routeGraph[nID].td = td;
 				this.routeGraph[nID].prevID = currentID;
 				testset.push(nID);
-			}	
+			}
 		}
 		this.routeGraph[currentID].visited = true;
 		currentID = 0;
 	}
-	
+
 	// get the actual route found
 	prevID = this.routeGraph[sToID].prevID;
 	while (prevID != sFromID) {
@@ -311,4 +341,4 @@ P.Route = function (fromSystemID, toSystemID, avoidList, avoidLow, avoidHi) {
 	// route.reverse();
 	// route.unshift(toSystemID);
 	return route;
-};	
+};

@@ -9,18 +9,22 @@ var promise;
 var promise_done;
 var promise_fail;
 var progress_counter;
+
 function promise_wait() {
 	if (promise_done) return true;
 	return false;
 }
+
 function promise_thenDone() {
 	promise_done = true;
 	promise_fail = false;
 }
+
 function promise_thenFail() {
 	promise_done = true;
 	promise_fail = true;
 }
+
 function progress_track() {
 	// console.info("progress tracker, has: " + arg.has + " needs: " + arg.needs);
 	progress_counter++;
@@ -64,10 +68,13 @@ var jita_dodixie_low = [
 describe("map setup", function() {
 	it("loads a valid source", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/105658"});
-		}
-		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\105658"});
+			SDD = EVEoj.SDD.Create("json", {
+				path: "http://eve-oj.dev/sdd/105658"
+			});
+		} else {
+			SDD = EVEoj.SDD.Create("json", {
+				path: "D:\\projects\\xyjax\\static\\sdd\\105658"
+			});
 		}
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
@@ -75,7 +82,7 @@ describe("map setup", function() {
 		promise_done = false;
 		promise_fail = undefined;
 		promise.then(promise_thenDone, promise_thenFail);
-    });	
+	});
 });
 
 describe("map setup", function() {
@@ -95,17 +102,19 @@ describe("map setup", function() {
 });
 
 describe("map.Create", function() {
-    it("returns null for invalid source", function() {
+	it("returns null for invalid source", function() {
 		var map_invalid = EVEoj.map.Create(null, "W");
-        expect(map_invalid).toBeNull(null);
-    });
-    it("returns null for invalid type", function() {
+		expect(map_invalid).toBeNull(null);
+	});
+	it("returns null for invalid type", function() {
 		var map_invalid = EVEoj.map.Create(SDD, "P");
-        expect(map_invalid).toBeNull(null);
-    });
+		expect(map_invalid).toBeNull(null);
+	});
 	it("returns a new object for a valid type", function() {
-		map = EVEoj.map.Create(SDD, "K", {planets: true});
-        expect(map).not.toBeNull(null);
+		map = EVEoj.map.Create(SDD, "K", {
+			planets: true
+		});
+		expect(map).not.toBeNull(null);
 		expect(EVEoj.map.P.isPrototypeOf(map)).toEqual(true);
 	});
 });
@@ -140,15 +149,17 @@ describe("map pre-load", function() {
 */
 
 describe("map.Load", function() {
-    it("returns a promise", function() {
+	it("returns a promise", function() {
 		progress_counter = 0;
-		promise = map.Load({progress: progress_track});
+		promise = map.Load({
+			progress: progress_track
+		});
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise_done = false;
 		promise_fail = undefined;
 		promise.then(promise_thenDone, promise_thenFail);
-    });
+	});
 });
 
 describe("map", function() {
@@ -160,17 +171,23 @@ describe("map", function() {
 			expect(promise_fail).toEqual(false);
 		});
 	});
-	
+
 	it("called progress tracker", function() {
 		// if any tables this depends on were previously loaded in other specs, this could become inaccurate
 		expect(progress_counter).toEqual(20);
 	});
-	
+
 	it("gets systems", function() {
-		var sys1 = map.GetSystem({name: "Jita"});
-		var sys2 = map.GetSystem({id: 30000142});
-		var sys3 = map.GetSystem({id: "30000142"});
-		
+		var sys1 = map.GetSystem({
+			name: "Jita"
+		});
+		var sys2 = map.GetSystem({
+			id: 30000142
+		});
+		var sys3 = map.GetSystem({
+			id: "30000142"
+		});
+
 		expect(sys1).not.toBeNull();
 		expect(sys2).not.toBeNull();
 		expect(sys3).not.toBeNull();
@@ -185,19 +202,19 @@ describe("map", function() {
 		var sys_n1 = null;
 		var sys_n2 = null;
 		var sys = null;
-		
+
 		while (iter.HasNext()) {
 			sys = iter.Next();
 			sys_count++;
 			if (sys_count == 373) sys_n1 = sys.name;
 			else if (sys_count == 4710) sys_n2 = sys.name;
 		}
-		
+
 		expect(sys_count).toEqual(5201);
 		expect(sys_n1).toEqual("0-G8NO");
 		expect(sys_n2).toEqual("1-NJLK");
 	});
-	
+
 	it("plots Jita to Jita", function() {
 		var route = map.Route(jitaID, jitaID, [], false, false);
 		expect(route).toEqual([]);
@@ -222,7 +239,7 @@ describe("map", function() {
 		var route = map.Route(jitaID, amarrID, [niarjaID], true, false);
 		expect(route).toEqual(jita_amarr_avoid);
 	});
-	
+
 	it("plots Jita to Dodixie, shortest", function() {
 		var route = map.Route(jitaID, dodixieID, [], false, false);
 		expect(route).toEqual(jita_dodixie_short);
@@ -242,10 +259,10 @@ describe("map", function() {
 		var route = map.Route(jitaID, dodixieID, [], false, true);
 		expect(route).toEqual(jita_dodixie_low);
 	});
-	
+
 	it("finds jump distance Jita to X-CFN6", function() {
 		var dist = map.JumpDist(jitaID, xcfn6ID);
 		expect(dist.toFixed(3)).toEqual("15.197");
 	});
-	
+
 });

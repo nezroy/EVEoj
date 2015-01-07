@@ -8,18 +8,22 @@ var promise;
 var promise_done;
 var promise_fail;
 var progress_counter;
+
 function promise_wait() {
 	if (promise_done) return true;
 	return false;
 }
+
 function promise_thenDone() {
 	promise_done = true;
 	promise_fail = false;
 }
+
 function promise_thenFail() {
 	promise_done = true;
 	promise_fail = true;
 }
+
 function progress_track() {
 	progress_counter++;
 }
@@ -27,10 +31,13 @@ function progress_track() {
 describe("SDD.Table setup", function() {
 	it("loads a valid source", function() {
 		if (EVEoj.Utils.isBrowser) {
-			SDD = EVEoj.SDD.Create("json", {path: "http://eve-oj.dev/sdd/105658"});
-		}
-		else {
-			SDD = EVEoj.SDD.Create("json", {path: "D:\\projects\\xyjax\\static\\sdd\\105658"});
+			SDD = EVEoj.SDD.Create("json", {
+				path: "http://eve-oj.dev/sdd/105658"
+			});
+		} else {
+			SDD = EVEoj.SDD.Create("json", {
+				path: "D:\\projects\\xyjax\\static\\sdd\\105658"
+			});
 		}
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
@@ -38,7 +45,7 @@ describe("SDD.Table setup", function() {
 		promise_done = false;
 		promise_fail = undefined;
 		promise.then(promise_thenDone, promise_thenFail);
-    });	
+	});
 });
 
 describe("SDD.Table setup", function() {
@@ -59,11 +66,11 @@ describe("SDD.Table setup", function() {
 
 describe("SDD.Table pre-load", function() {
 	var table;
-	
+
 	beforeEach(function() {
 		table = SDD.GetTable("invTypes");
 	});
-	
+
 	it("has expected metainfo", function() {
 		var table = SDD.GetTable("invTypes");
 		var columns = [
@@ -81,23 +88,23 @@ describe("SDD.Table pre-load", function() {
 		expect(table.GetEntry(37)).toEqual(false);
 		expect(table.GetEntry(60000000)).toEqual(false);
 	});
-	
+
 });
 
 describe("SDD.Table.Load", function() {
-    it("returns a promise", function() {
+	it("returns a promise", function() {
 		promise = SDD.GetTable("invTypes").Load();
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise_done = false;
 		promise_fail = undefined;
 		promise.then(promise_thenDone, promise_thenFail);
-    });
+	});
 });
 
 describe("SDD.Table", function() {
 	var table;
-	
+
 	beforeEach(function() {
 		table = SDD.GetTable("invTypes");
 	});
@@ -150,22 +157,25 @@ describe("SDD.Table", function() {
 });
 
 describe("SDD.Table.Load partial", function() {
-    it("returns a promise", function() {
+	it("returns a promise", function() {
 		var table = SDD.GetTable("invTypesDesc");
 		expect(table.segments.length).toEqual(3);
 		progress_counter = 0;
-		promise = table.Load({key: 37, progress: progress_track});
+		promise = table.Load({
+			key: 37,
+			progress: progress_track
+		});
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise_done = false;
 		promise_fail = undefined;
 		promise.then(promise_thenDone, promise_thenFail);
-    });
+	});
 });
 
 describe("SDD.Table partial", function() {
 	var table;
-	
+
 	beforeEach(function() {
 		table = SDD.GetTable("invTypesDesc");
 	});
@@ -220,22 +230,24 @@ describe("SDD.Table partial", function() {
 });
 
 describe("SDD.Table.Load remaining", function() {
-    it("returns a promise", function() {
+	it("returns a promise", function() {
 		var table = SDD.GetTable("invTypesDesc");
 		expect(table.segments.length).toEqual(3);
 		progress_counter = 0;
-		promise = table.Load({progress: progress_track});
+		promise = table.Load({
+			progress: progress_track
+		});
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise_done = false;
 		promise_fail = undefined;
 		promise.then(promise_thenDone, promise_thenFail);
-    });
+	});
 });
 
 describe("SDD.Table remaining", function() {
 	var table;
-	
+
 	beforeEach(function() {
 		table = SDD.GetTable("invTypesDesc");
 	});
@@ -250,7 +262,7 @@ describe("SDD.Table remaining", function() {
 	});
 	it("called progress tracker", function() {
 		expect(progress_counter).toEqual(2);
-	});	
+	});
 	it("has expected data", function() {
 		expect(table.loaded).toEqual(table.length);
 		expect(table.length).toEqual(21975);
