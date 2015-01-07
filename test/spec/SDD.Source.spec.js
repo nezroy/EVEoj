@@ -1,5 +1,6 @@
 "use strict";
 
+var props = require("../testprops.js");
 var EVEoj = require("../../src/EVEoj.js");
 
 var SDD;
@@ -63,11 +64,11 @@ describe("SDD.Source.LoadMeta", function() {
 	it("returns a promise", function() {
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
-				path: "http://eve-oj.dev/sdd/105658"
+				path: props.SDD_URL_path
 			});
 		} else {
 			SDD = EVEoj.SDD.Create("json", {
-				path: "D:\\projects\\xyjax\\static\\sdd\\105658"
+				path: props.SDD_file_path
 			});
 		}
 		promise2 = SDD.LoadMeta();
@@ -97,9 +98,9 @@ describe("SDD.Source", function() {
 		});
 	});
 	it("has valid metainfo", function() {
-		expect(SDD.version).toEqual(105658);
-		expect(SDD.verdesc).toEqual("Oceanus 1.0");
-		expect(SDD.schema).toEqual(100038);
+		expect(SDD.version).toEqual(props.SDD_version);
+		expect(SDD.verdesc).toEqual(props.SDD_verdesc);
+		expect(SDD.schema).toEqual(props.SDD_schema);
 	});
 	it("has expected tables", function() {
 		var schema_100038 = [

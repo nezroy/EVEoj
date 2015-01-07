@@ -1,5 +1,6 @@
 "use strict";
 
+var props = require("../testprops.js");
 var EVEoj = require("../../src/EVEoj.js");
 
 var SDD;
@@ -8,6 +9,8 @@ var promise;
 var promise_done;
 var promise_fail;
 var progress_counter;
+
+var inv_types_size = 22328;
 
 function promise_wait() {
 	if (promise_done) return true;
@@ -32,11 +35,11 @@ describe("SDD.Table setup", function() {
 	it("loads a valid source", function() {
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
-				path: "http://eve-oj.dev/sdd/105658"
+				path: props.SDD_URL_path
 			});
 		} else {
 			SDD = EVEoj.SDD.Create("json", {
-				path: "D:\\projects\\xyjax\\static\\sdd\\105658"
+				path: props.SDD_file_path
 			});
 		}
 		expect(SDD).not.toBeNull(null);
@@ -58,9 +61,9 @@ describe("SDD.Table setup", function() {
 		});
 	});
 	it("has valid metainfo", function() {
-		expect(SDD.version).toEqual(105658);
-		expect(SDD.verdesc).toEqual("Oceanus 1.0");
-		expect(SDD.schema).toEqual(100038);
+		expect(SDD.version).toEqual(props.SDD_version);
+		expect(SDD.verdesc).toEqual(props.SDD_verdesc);
+		expect(SDD.schema).toEqual(props.SDD_schema);
 	});
 });
 
@@ -119,7 +122,7 @@ describe("SDD.Table", function() {
 	});
 	it("has expected data", function() {
 		expect(table.length).toEqual(table.loaded);
-		expect(table.length).toEqual(21975);
+		expect(table.length).toEqual(inv_types_size);
 	});
 	it("returns null for non-existent entries", function() {
 		expect(table.GetEntry(60000000)).toBeNull();
@@ -193,7 +196,7 @@ describe("SDD.Table partial", function() {
 	});
 	it("has expected data", function() {
 		expect(table.loaded).toEqual(7500);
-		expect(table.length).toEqual(21975);
+		expect(table.length).toEqual(inv_types_size);
 		expect(table.segments[0].loaded).toEqual(true);
 		expect(table.segments[1].loaded).toEqual(false);
 	});
@@ -265,7 +268,7 @@ describe("SDD.Table remaining", function() {
 	});
 	it("has expected data", function() {
 		expect(table.loaded).toEqual(table.length);
-		expect(table.length).toEqual(21975);
+		expect(table.length).toEqual(inv_types_size);
 		expect(table.segments[0].loaded).toEqual(true);
 		expect(table.segments[1].loaded).toEqual(true);
 		expect(table.segments[2].loaded).toEqual(true);

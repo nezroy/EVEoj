@@ -1,5 +1,6 @@
 "use strict";
 
+var props = require("../testprops.js");
 var EVEoj = require("../../src/EVEoj.js");
 
 describe("SDD.Create", function() {
@@ -11,11 +12,11 @@ describe("SDD.Create", function() {
 		var SDD;
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
-				path: "http://eve-oj.dev/sdd/105658"
+				path: props.SDD_URL_path
 			});
 		} else {
 			SDD = EVEoj.SDD.Create("json", {
-				path: "D:\\projects\\xyjax\\static\\sdd\\105658"
+				path: props.SDD_file_path
 			});
 		}
 		expect(SDD).not.toBeNull(null);
