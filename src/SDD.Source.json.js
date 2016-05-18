@@ -1,5 +1,3 @@
-"use strict";
-
 var Utils = require("./Utils");
 var req_browser_ignore = require;
 

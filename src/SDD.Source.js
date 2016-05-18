@@ -1,5 +1,3 @@
-"use strict";
-
 // var Utils = require('./Utils');
 var P = exports.P = {}; // public methods
 

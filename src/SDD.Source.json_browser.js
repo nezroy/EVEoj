@@ -1,5 +1,3 @@
-"use strict";
-
 var extend = require("node.extend");
 var Source = require("./SDD.Source.js");
 var Table = require("./SDD.Table.js");

@@ -1,7 +1,5 @@
 /* global jQuery: false */
 /* global Promise: false */
-"use strict";
-
 exports.isBrowser = typeof(window) !== "undefined";
 
 var req_browser_ignore = require;

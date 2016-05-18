@@ -1,5 +1,3 @@
-"use strict";
-
 exports.Const = require("./Const.js");
 exports.Utils = require("./Utils.js");
 exports.SDD = require("./SDD.js");

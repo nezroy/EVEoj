@@ -1,7 +1,5 @@
 /* global jQuery: false */
 /* global CCPEVE: false */
-"use strict";
-
 var $ = jQuery;
 
 function IGBClick(ev) {

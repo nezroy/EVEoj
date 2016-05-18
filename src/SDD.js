@@ -1,5 +1,3 @@
-"use strict";
-
 // var Utils = require('./Utils');
 
 exports.Source = require("./SDD.Source.js");

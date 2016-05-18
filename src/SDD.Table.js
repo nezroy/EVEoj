@@ -1,5 +1,3 @@
-"use strict";
-
 var extend = require("node.extend");
 var Utils = require("./Utils.js");
 
