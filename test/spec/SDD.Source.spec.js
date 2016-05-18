@@ -1,50 +1,23 @@
-"use strict";
+/* globals window: false */
+var isBrowser = typeof(window) !== "undefined";
+var EVEoj;
+var props;
 
-var props = require("../testprops.js");
-var EVEoj = require("../../src/EVEoj.js");
+if (isBrowser) {
+	EVEoj = window.EVEoj;
+	props = window.testprops;
+} else {
+	EVEoj = require("../../src/EVEoj");
+	props = require("../testprops");
+}
 
 var SDD;
 var SDD_badpath;
 var promise1;
 var promise2;
 
-var promise1_done;
-var promise2_done;
-var promise1_fail;
-var promise2_fail;
-
-function promise1_wait() {
-	if (promise1_done) return true;
-	return false;
-}
-
-function promise1_thenDone() {
-	promise1_done = true;
-	promise1_fail = false;
-}
-
-function promise1_thenFail() {
-	promise1_done = true;
-	promise1_fail = true;
-}
-
-function promise2_wait() {
-	if (promise2_done) return true;
-	return false;
-}
-
-function promise2_thenDone() {
-	promise2_done = true;
-	promise2_fail = false;
-}
-
-function promise2_thenFail() {
-	promise2_done = true;
-	promise2_fail = true;
-}
-
 describe("SDD.Source.LoadMeta", function() {
-	it("returns a promise for a bad path", function() {
+	it("returns a promise for a bad path", function(done) {
 		if (EVEoj.Utils.isBrowser) {
 			SDD_badpath = EVEoj.SDD.Create("json", {
 				path: "http://eve-oj.dev/sdd/fred"
@@ -57,11 +30,14 @@ describe("SDD.Source.LoadMeta", function() {
 		promise1 = SDD_badpath.LoadMeta();
 		expect(promise1).not.toBeNull(null);
 		expect(typeof(promise1.then)).toEqual("function");
-		promise1_done = false;
-		promise1_fail = undefined;
-		promise1.then(promise1_thenDone, promise1_thenFail);
+		promise1
+			.then(function() {
+				fail("load succeeded when it should have failed");
+			})
+			.caught(function() {})
+			.lastly(done);
 	});
-	it("returns a promise", function() {
+	it("returns a promise", function(done) {
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
 				path: props.SDD_URL_path
@@ -74,29 +50,13 @@ describe("SDD.Source.LoadMeta", function() {
 		promise2 = SDD.LoadMeta();
 		expect(promise2).not.toEqual(null);
 		expect(typeof(promise2.then)).toEqual("function");
-		promise2_done = false;
-		promise2_fail = undefined;
-		promise2.then(promise2_thenDone, promise2_thenFail);
+		promise2.caught(function(ex) {
+			fail(ex.error);
+		}).lastly(done);
 	});
 });
 
 describe("SDD.Source", function() {
-	it("fails asynchronously for a bad path", function() {
-		waitsFor(promise1_wait, 2500);
-		runs(function() {
-			expect(promise1_done).toEqual(true);
-			expect(promise1_fail).toBeDefined();
-			expect(promise1_fail).toEqual(true);
-		});
-	});
-	it("succeeds asynchronously", function() {
-		waitsFor(promise2_wait, 2500);
-		runs(function() {
-			expect(promise2_done).toEqual(true);
-			expect(promise2_fail).toBeDefined();
-			expect(promise2_fail).toEqual(false);
-		});
-	});
 	it("has valid metainfo", function() {
 		expect(SDD.version).toEqual(props.SDD_version);
 		expect(SDD.verdesc).toEqual(props.SDD_verdesc);

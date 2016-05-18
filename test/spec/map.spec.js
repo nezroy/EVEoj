@@ -1,33 +1,23 @@
-"use strict";
+/* globals window: false */
+var isBrowser = typeof(window) !== "undefined";
+var EVEoj;
+var props;
 
-var props = require("../testprops.js");
-var EVEoj = require("../../src/EVEoj.js");
+if (isBrowser) {
+	EVEoj = window.EVEoj;
+	props = window.testprops;
+} else {
+	EVEoj = require("../../src/EVEoj");
+	props = require("../testprops");
+}
 
 var SDD;
 var map;
 var promise;
 
-var promise_done;
-var promise_fail;
 var progress_counter;
 
-function promise_wait() {
-	if (promise_done) return true;
-	return false;
-}
-
-function promise_thenDone() {
-	promise_done = true;
-	promise_fail = false;
-}
-
-function promise_thenFail() {
-	promise_done = true;
-	promise_fail = true;
-}
-
 function progress_track() {
-	// console.info("progress tracker, has: " + arg.has + " needs: " + arg.needs);
 	progress_counter++;
 }
 
@@ -66,9 +56,10 @@ var jita_dodixie_low = [
 	30002640, 30002661, 30002659
 ];
 
+
 describe("map setup", function() {
-	it("loads a valid source", function() {
-		if (EVEoj.Utils.isBrowser) {
+	it("loads a valid source asynchronously", function(done) {
+		if (isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
 				path: props.SDD_URL_path
 			});
@@ -80,21 +71,13 @@ describe("map setup", function() {
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
 		expect(promise).not.toEqual(null);
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
+		promise.caught(function(ex) {
+			fail(ex.error);
+		}).lastly(done);
 	});
 });
 
 describe("map setup", function() {
-	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 2500);
-		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
-		});
-	});
 	it("has valid metainfo", function() {
 		expect(SDD.version).toEqual(props.SDD_version);
 		expect(SDD.verdesc).toEqual(props.SDD_verdesc);
@@ -120,59 +103,21 @@ describe("map.Create", function() {
 	});
 });
 
-/*
-describe("map pre-load", function() {
-	var table;
-	
-	beforeEach(function() {
-		table = SDD.GetTable("invTypes");
-	});
-	
-	it("has expected metainfo", function() {
-		var table = SDD.GetTable("invTypes");
-		var columns = [
-			"typeID", "groupID", "typeName", "mass", "volume", "capacity", "portionSize",
-			"raceID", "basePrice", "published", "marketGroupID", "chanceOfDuplicating", "iconID"
-		];
-		expect(table.name).toEqual("invTypes");
-		expect(table.keyname).toEqual("typeID");
-		expect(table.columns).toEqual(columns);
-		expect(table.segments.length).toEqual(1);
-		expect(table.c.index).toEqual(0);
-		expect(table.c.published).toEqual(9);
-	});
-	it("returns false for unknown entries", function() {
-		expect(table.GetEntry(37)).toEqual(false);
-		expect(table.GetEntry(60000000)).toEqual(false);
-	});
-	
-});
-*/
-
 describe("map.Load", function() {
-	it("returns a promise", function() {
+	it("returns a promise", function(done) {
 		progress_counter = 0;
 		promise = map.Load({
 			progress: progress_track
 		});
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
-	});
+		promise.caught(function(ex) {
+			fail(ex.error);
+		}).lastly(done);
+	}, 20000);
 });
 
 describe("map", function() {
-	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 10000);
-		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
-		});
-	});
-
 	it("called progress tracker", function() {
 		// if any tables this depends on were previously loaded in other specs, this could become inaccurate
 		expect(progress_counter).toEqual(20);

@@ -1,32 +1,22 @@
-"use strict";
+/* globals window: false */
+var isBrowser = typeof(window) !== "undefined";
+var EVEoj;
+var props;
 
-var props = require("../testprops.js");
-var EVEoj = require("../../src/EVEoj.js");
+if (isBrowser) {
+	EVEoj = window.EVEoj;
+	props = window.testprops;
+} else {
+	EVEoj = require("../../src/EVEoj");
+	props = require("../testprops");
+}
 
 var SDD;
 var map;
 var promise;
 
-var promise_done;
-var promise_fail;
-
-function promise_wait() {
-	if (promise_done) return true;
-	return false;
-}
-
-function promise_thenDone() {
-	promise_done = true;
-	promise_fail = false;
-}
-
-function promise_thenFail() {
-	promise_done = true;
-	promise_fail = true;
-}
-
 describe("map.System setup", function() {
-	it("loads a valid source", function() {
+	it("loads a valid source", function(done) {
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
 				path: props.SDD_URL_path
@@ -39,21 +29,13 @@ describe("map.System setup", function() {
 		expect(SDD).not.toBeNull(null);
 		promise = SDD.LoadMeta();
 		expect(promise).not.toEqual(null);
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
+		promise.caught(function(ex) {
+			fail(ex.error);
+		}).lastly(done);
 	});
 });
 
 describe("map.System setup", function() {
-	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 2500);
-		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
-		});
-	});
 	it("has valid metainfo", function() {
 		expect(SDD.version).toEqual(props.SDD_version);
 		expect(SDD.verdesc).toEqual(props.SDD_verdesc);
@@ -64,24 +46,13 @@ describe("map.System setup", function() {
 		expect(map).not.toBeNull(null);
 		expect(EVEoj.map.P.isPrototypeOf(map)).toEqual(true);
 	});
-	it("returns a promise", function() {
+	it("returns a promise", function(done) {
 		promise = map.Load();
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
-		promise_done = false;
-		promise_fail = undefined;
-		promise.then(promise_thenDone, promise_thenFail);
-	});
-});
-
-describe("map.System setup", function() {
-	it("succeeds asynchronously", function() {
-		waitsFor(promise_wait, 10000);
-		runs(function() {
-			expect(promise_done).toEqual(true);
-			expect(promise_fail).toBeDefined();
-			expect(promise_fail).toEqual(false);
-		});
+		promise.caught(function(ex) {
+			fail(ex.error);
+		}).lastly(done);
 	});
 });
 

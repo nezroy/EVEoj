@@ -19,7 +19,7 @@
     "quotmark": "double",
     "undef": true,
     "unused": true,
-    "strict": true,
+    "globalstrict": true,
     // "maxparams": 0,
     // "maxdepth": 0,
     // "maxstatements": 0,
@@ -27,6 +27,7 @@
     // "maxlen": 0,
 
     /* relaxing */
+    "strict": false,
     "asi": false,
     "boss": false,
     // "debug": false,
@@ -79,7 +80,7 @@
         "describe": false,
         "expect": false,
         "it": false,
-        "runs": false,
-        "waitsFor": false
+        "fail": false,
+        "JSON": false
     }
 }

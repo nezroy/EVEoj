@@ -1,7 +1,15 @@
-"use strict";
+/* globals window: false */
+var isBrowser = typeof(window) !== "undefined";
+var EVEoj;
+var props;
 
-var props = require("../testprops.js");
-var EVEoj = require("../../src/EVEoj.js");
+if (isBrowser) {
+	EVEoj = window.EVEoj;
+    props = window.testprops;
+} else {
+	EVEoj = require("../../src/EVEoj");
+    props = require("../testprops");
+}
 
 describe("SDD.Create", function() {
 	it("returns null for invalid type", function() {

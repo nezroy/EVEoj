@@ -1,6 +1,15 @@
-"use strict";
+/* globals window: false */
+var isBrowser = typeof(window) !== "undefined";
+var EVEoj;
+var props;
 
-var EVEoj = require("../../src/EVEoj.js");
+if (isBrowser) {
+	EVEoj = window.EVEoj;
+	props = window.testprops;
+} else {
+	EVEoj = require("../../src/EVEoj");
+	props = require("../testprops");
+}
 
 describe("core", function() {
 	it("has expected version", function() {

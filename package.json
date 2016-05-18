@@ -21,20 +21,18 @@
   "bugs": {
     "url": "https://github.com/xyjax/EVEoj/issues"
   },
-  "homepage": "http://eve-oj.com",
+  "homepage": "http://eve-oj.xyjax.com",
   "dependencies": {
-    "bluebird": "^2.2.2",
-    "node.extend": "^1.0.10"
+    "bluebird": "3.3.x",
+    "node.extend": "1.1.x"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-browserify": "^2.1.4",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-uglify": "^0.5.1",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-watchify": "^0.1.0",	
-    "grunt-contrib-jasmine": "~0.5.3",
-    "grunt-jasmine-node": "~0.2.1",
-    "jasmine-node": "~1.14.5"
+    "grunt": "1.0.x",
+    "grunt-browserify": "5.0.x",
+    "grunt-contrib-jshint": "1.0.x",
+    "grunt-contrib-uglify": "1.0.x",
+    "grunt-contrib-jasmine": "1.0.x",
+    "grunt-jasmine-nodejs": "1.5.x",
+    "jasmine-node": "1.14.x"
   }
 }

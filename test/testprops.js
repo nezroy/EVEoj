@@ -1,7 +1,16 @@
-"use strict";
+/* globals window: false */
+var isBrowser = typeof(window) !== "undefined";
+var exp;
 
-exports.SDD_file_path = "D:\\projects\\xyjax\\static\\sdd\\109013";
-exports.SDD_URL_path = "http://eve-oj.dev/sdd/109013";
-exports.SDD_version = 109013;
-exports.SDD_verdesc = "Rhea 1.0";
-exports.SDD_schema = 109013;
+if (isBrowser) {
+    exp = window.testprops = {};
+}
+else {
+    exp = exports;
+}
+
+exp.SDD_file_path = "D:\\projects\\xyjax\\static\\sdd\\109795";
+exp.SDD_URL_path = "http://static.xyjax.dev/sdd/109795";
+exp.SDD_version = 109795;
+exp.SDD_verdesc = "Proteus 1.0";
+exp.SDD_schema = 109013;
