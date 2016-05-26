@@ -17,7 +17,7 @@ var promise1;
 var promise2;
 
 describe("SDD.Source.LoadMeta", function() {
-	it("returns a promise for a bad path", function(done) {
+	it("fails on an invalid source", function(done) {
 		if (EVEoj.Utils.isBrowser) {
 			SDD_badpath = EVEoj.SDD.Create("json", {
 				path: "http://eve-oj.dev/sdd/fred"
@@ -37,7 +37,7 @@ describe("SDD.Source.LoadMeta", function() {
 			.caught(function() {})
 			.lastly(done);
 	});
-	it("returns a promise", function(done) {
+	it("loads a valid source asynchronously", function(done) {
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
 				path: props.SDD_URL_path
@@ -54,9 +54,6 @@ describe("SDD.Source.LoadMeta", function() {
 			fail(ex.error);
 		}).lastly(done);
 	});
-});
-
-describe("SDD.Source", function() {
 	it("has valid metainfo", function() {
 		expect(SDD.version).toEqual(props.SDD_version);
 		expect(SDD.verdesc).toEqual(props.SDD_verdesc);

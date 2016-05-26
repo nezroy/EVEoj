@@ -15,8 +15,8 @@ var SDD;
 var map;
 var promise;
 
-describe("map.System setup", function() {
-	it("loads a valid source", function(done) {
+describe("map.System", function() {
+	it("loads valid metadata asynchronously", function(done) {
 		if (EVEoj.Utils.isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
 				path: props.SDD_URL_path
@@ -33,9 +33,6 @@ describe("map.System setup", function() {
 			fail(ex.error);
 		}).lastly(done);
 	});
-});
-
-describe("map.System setup", function() {
 	it("has valid metainfo", function() {
 		expect(SDD.version).toEqual(props.SDD_version);
 		expect(SDD.verdesc).toEqual(props.SDD_verdesc);
@@ -46,7 +43,7 @@ describe("map.System setup", function() {
 		expect(map).not.toBeNull(null);
 		expect(EVEoj.map.P.isPrototypeOf(map)).toEqual(true);
 	});
-	it("returns a promise", function(done) {
+	it("loads a valid source asynchronously", function(done) {
 		promise = map.Load();
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
@@ -56,7 +53,7 @@ describe("map.System setup", function() {
 	});
 });
 
-describe("map.System", function() {
+describe("map.System systems", function() {
 	var sys1;
 	var sys2;
 	var sys3;
@@ -81,54 +78,53 @@ describe("map.System", function() {
 		expect(sys4).not.toBeNull();
 	});
 
-	it("has expected name", function() {
+	it("have expected name", function() {
 		expect(sys1.name).toEqual("Amarr");
 		expect(sys2.name).toEqual("Olide");
 		expect(sys3.name).toEqual("Olin");
 		expect(sys4.name).toEqual("X-PQEX");
 	});
 
-	it("has expected contiguity data", function() {
+	it("have expected contiguity data", function() {
 		expect(sys1.contiguous).toEqual(true);
 		expect(sys2.contiguous).toEqual(false);
 		expect(sys3.contiguous).toEqual(false);
 		expect(sys4.contiguous).toEqual(false);
 	});
 
-	it("has expected truesec", function() {
+	it("have expected truesec", function() {
 		expect(sys1.security).toEqual(1);
 		expect(sys2.security).toEqual(0.7416);
 		expect(sys3.security).toEqual(0.311446);
 		expect(sys4.security).toEqual(-0.540927);
 	});
 
-	it("has expected security", function() {
+	it("have expected security", function() {
 		expect(sys1.sec).toEqual("1.0");
 		expect(sys2.sec).toEqual("0.7");
 		expect(sys3.sec).toEqual("0.3");
 		expect(sys4.sec).toEqual("0.0");
 	});
 
-	it("has expected posMin.y", function() {
+	it("have expected posMin.y", function() {
 		expect(sys1.posMin.y).toEqual(40238358304938660);
 		expect(sys2.posMin.y).toEqual(-12701098420635534);
 		expect(sys3.posMin.y).toEqual(-2618156629040208);
 		expect(sys4.posMin.y).toEqual(75485681880991120);
 	});
-    
-	it("has expected posMax.x", function() {
+
+	it("have expected posMax.x", function() {
 		expect(sys1.posMax.x).toEqual(-204748335941305250);
 		expect(sys2.posMax.x).toEqual(-200296649701113180);
 		expect(sys3.posMax.x).toEqual(-298025094269374000);
 		expect(sys4.posMax.x).toEqual(154669319414762560);
 	});
-    
-	it("has expected pos.z", function() {
+
+	it("have expected pos.z", function() {
 		expect(sys1.pos.z).toEqual(-57621278902421040);
 		expect(sys2.pos.z).toEqual(8548456481539123);
 		expect(sys3.pos.z).toEqual(-31784751461509644);
 		expect(sys4.pos.z).toEqual(96773224779781040);
 	});
-    
-    
+
 });

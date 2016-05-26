@@ -57,8 +57,8 @@ var jita_dodixie_low = [
 ];
 
 
-describe("map setup", function() {
-	it("loads a valid source asynchronously", function(done) {
+describe("map", function() {
+	it("loads valid metadata asynchronously", function(done) {
 		if (isBrowser) {
 			SDD = EVEoj.SDD.Create("json", {
 				path: props.SDD_URL_path
@@ -75,25 +75,23 @@ describe("map setup", function() {
 			fail(ex.error);
 		}).lastly(done);
 	});
-});
 
-describe("map setup", function() {
 	it("has valid metainfo", function() {
 		expect(SDD.version).toEqual(props.SDD_version);
 		expect(SDD.verdesc).toEqual(props.SDD_verdesc);
 		expect(SDD.schema).toEqual(props.SDD_schema);
 	});
-});
 
-describe("map.Create", function() {
 	it("returns null for invalid source", function() {
 		var map_invalid = EVEoj.map.Create(null, "W");
 		expect(map_invalid).toBeNull(null);
 	});
+
 	it("returns null for invalid type", function() {
 		var map_invalid = EVEoj.map.Create(SDD, "P");
 		expect(map_invalid).toBeNull(null);
 	});
+
 	it("returns a new object for a valid type", function() {
 		map = EVEoj.map.Create(SDD, "K", {
 			planets: true
@@ -101,10 +99,8 @@ describe("map.Create", function() {
 		expect(map).not.toBeNull(null);
 		expect(EVEoj.map.P.isPrototypeOf(map)).toEqual(true);
 	});
-});
 
-describe("map.Load", function() {
-	it("returns a promise", function(done) {
+	it("loads a valid source asynchronously", function(done) {
 		progress_counter = 0;
 		promise = map.Load({
 			progress: progress_track
@@ -114,10 +110,8 @@ describe("map.Load", function() {
 		promise.caught(function(ex) {
 			fail(ex.error);
 		}).lastly(done);
-	}, 20000);
-});
+	});
 
-describe("map", function() {
 	it("called progress tracker", function() {
 		// if any tables this depends on were previously loaded in other specs, this could become inaccurate
 		expect(progress_counter).toEqual(12);
