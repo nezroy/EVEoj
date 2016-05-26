@@ -120,7 +120,7 @@ describe("map.Load", function() {
 describe("map", function() {
 	it("called progress tracker", function() {
 		// if any tables this depends on were previously loaded in other specs, this could become inaccurate
-		expect(progress_counter).toEqual(20);
+		expect(progress_counter).toEqual(12);
 	});
 
 	it("gets systems", function() {

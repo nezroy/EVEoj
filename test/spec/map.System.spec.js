@@ -110,9 +110,25 @@ describe("map.System", function() {
 	});
 
 	it("has expected posMin.y", function() {
-		expect(sys1.posMin.y).toEqual(4.02384e+016);
-		expect(sys2.posMin.y).toEqual(-1.27011e+016);
-		expect(sys3.posMin.y).toEqual(-2.61816e+015);
-		expect(sys4.posMin.y).toEqual(7.54857e+016);
+		expect(sys1.posMin.y).toEqual(40238358304938660);
+		expect(sys2.posMin.y).toEqual(-12701098420635534);
+		expect(sys3.posMin.y).toEqual(-2618156629040208);
+		expect(sys4.posMin.y).toEqual(75485681880991120);
 	});
+    
+	it("has expected posMax.x", function() {
+		expect(sys1.posMax.x).toEqual(-204748335941305250);
+		expect(sys2.posMax.x).toEqual(-200296649701113180);
+		expect(sys3.posMax.x).toEqual(-298025094269374000);
+		expect(sys4.posMax.x).toEqual(154669319414762560);
+	});
+    
+	it("has expected pos.z", function() {
+		expect(sys1.pos.z).toEqual(-57621278902421040);
+		expect(sys2.pos.z).toEqual(8548456481539123);
+		expect(sys3.pos.z).toEqual(-31784751461509644);
+		expect(sys4.pos.z).toEqual(96773224779781040);
+	});
+    
+    
 });

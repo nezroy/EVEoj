@@ -23,7 +23,6 @@ exports.D = {
 		y: null,
 		z: null
 	},
-	luminosity: null,
 	border: null,
 	fringe: null,
 	corridor: null,
@@ -34,12 +33,11 @@ exports.D = {
 	contiguous: null,
 	security: null,
 	sec: null,
-	factionID: null,
 	radius: null,
-	sunTypeID: null,
 	securityClass: null,
 	wormholeClassID: null,
-	stationCount: null
+	stationCount: null,
+	jumps: null
 };
 exports.Create = function(tbl, ID) {
 	var obj,
@@ -60,21 +58,20 @@ exports.Create = function(tbl, ID) {
 	obj.regionID = sys[col.regionId];
 	obj.constellationID = sys[col.constellationID];
 	obj.pos = {
-		x: sys[col.x],
-		y: sys[col.y],
-		z: sys[col.z]
+		x: sys[col.center][0],
+		y: sys[col.center][1],
+		z: sys[col.center][2]
 	};
 	obj.posMin = {
-		x: sys[col.xMin],
-		y: sys[col.yMin],
-		z: sys[col.zMin]
+		x: sys[col.min][0],
+		y: sys[col.min][1],
+		z: sys[col.min][2]
 	};
 	obj.posMax = {
-		x: sys[col.xMax],
-		y: sys[col.yMax],
-		z: sys[col.zMax]
+		x: sys[col.max][0],
+		y: sys[col.max][1],
+		z: sys[col.max][2]
 	};
-	obj.luminosity = sys[col.luminosity];
 	obj.border = sys[col.border];
 	obj.fringe = sys[col.fringe];
 	obj.corridor = sys[col.corridor];
@@ -85,12 +82,11 @@ exports.Create = function(tbl, ID) {
 	obj.contiguous = sys[col.contiguous];
 	obj.security = sys[col.security];
 	obj.sec = (obj.security > 0) ? obj.security.toFixed(1) : "0.0";
-	obj.factionID = (sys[col.factionID] !== 0) ? sys[col.factionID] : null;
 	obj.radius = sys[col.radius];
-	obj.sunTypeID = sys[col.sunTypeID];
 	obj.securityClass = sys[col.securityClass];
 	obj.wormholeClassID = sys[col.wormholeClassID];
 	obj.stationCount = (sys[col.stationCount]) ? sys[col.stationCount] : 0;
+	obj.jumps = sys[col.jumps];
 
 	return obj;
 };

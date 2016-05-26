@@ -22,8 +22,8 @@ exports.D = {
 		moons: false,
 		belts: false,
 		gates: false,
-		celestials: false,
-		statistics: false,
+		stars: false,
+		objects: false,
 		landmarks: false
 	}
 };
@@ -32,7 +32,7 @@ var sys_cache = null; // a place to put generated systems so we don't keep re-cr
 
 exports.Create = function(src, type, config) {
 	if (!src || typeof src.HasTable != "function") return null;
-	if (type != "J" && type != "K" && type != "W") return null;
+	if (type != "K" && type != "X" && type != "J") return null;
 	var obj = Utils.create(P);
 	extend(true, obj, exports.D);
 	if (config) extend(true, obj.c, config);
@@ -123,12 +123,11 @@ P.Load = function(opts) {
 	t["map" + this.space + "Regions"] = false;
 	t["map" + this.space + "Constellations"] = false;
 	t["map" + this.space + "SolarSystems"] = false;
-	if (this.space == "K" || this.space == "J") {
-		t["map" + this.space + "SolarSystemJumps"] = false;
+	if (this.space == "K" || this.space == "X") {
 		if (this.c.jumps) {
-			t.mapRegionJumps = false;
-			t.mapConstellationJumps = false;
-			t.mapJumps = false;
+			t["map" + this.space + "RegionJumps"] = false;
+			t["map" + this.space + "ConstellationJumps"] = false;
+			t["map" + this.space + "SolarSystemJumps"] = false;
 		}
 		if (this.c.belts) t["map" + this.space + "Belts"] = false;
 		if (this.c.gates) t["map" + this.space + "Gates"] = false;
@@ -136,8 +135,8 @@ P.Load = function(opts) {
 	}
 	if (this.c.planets) t["map" + this.space + "Planets"] = false;
 	if (this.c.moons) t["map" + this.space + "Moons"] = false;
-	if (this.c.celestials) t["map" + this.space + "Celestials"] = false;
-	if (this.c.statistics) t["map" + this.space + "CelestialStatistics"] = false;
+	if (this.c.stars) t["map" + this.space + "Stars"] = false;
+	if (this.c.objects) t["map" + this.space + "SolarSystemObjects"] = false;
 
 	thenDone = function(arg) {
 		LoadDone.apply(self, [arg.table, arg.context]);
@@ -177,8 +176,7 @@ function LoadInit() {
 		solarSystemID,
 		toSolarSystemID,
 		system,
-		jumptblnm,
-		jumptbl,
+		i,
 		sys;
 
 	sys_cache = {};
@@ -187,9 +185,7 @@ function LoadInit() {
 		system = systbl.data[solarSystemID];
 		this.sysNameMap[system[colmap.solarSystemName]] = parseInt(solarSystemID, 10);
 		this.sysNames.push(system[colmap.solarSystemName]);
-		jumptblnm = false;
-		if (this.space != "W") jumptblnm = "map" + this.space + "SolarSystemJumps";
-		if (jumptblnm && this.tables.hasOwnProperty(jumptblnm)) {
+		if (this.space != "J") {
 			// create the routing graph used for path finding
 			sys = {
 				jumps: [],
@@ -197,9 +193,9 @@ function LoadInit() {
 				sec: system[colmap.security].toFixed(1),
 				name: system[colmap.solarSystemName]
 			};
-			jumptbl = this.tables[jumptblnm].tbl.data[solarSystemID];
-			for (toSolarSystemID in jumptbl) {
-				if (!jumptbl.hasOwnProperty(toSolarSystemID)) continue;
+			for (i = 0; i < system[colmap.jumps].length; i++) {
+				toSolarSystemID = system[colmap.jumps][i];
+				if (!systbl.data.hasOwnProperty(toSolarSystemID)) continue;
 				sys.jumps.push(toSolarSystemID);
 			}
 			this.routeGraph[solarSystemID] = sys;
@@ -232,12 +228,12 @@ P.GetSystems = function() {
 P.JumpDist = function(fromID, toID) {
 	var systbl = this.tables["map" + this.space + "SolarSystems"].tbl,
 		colmap = systbl.colmap,
-		x1 = systbl.data[fromID][colmap.x],
-		x2 = systbl.data[toID][colmap.x],
-		y1 = systbl.data[fromID][colmap.y],
-		y2 = systbl.data[toID][colmap.y],
-		z1 = systbl.data[fromID][colmap.z],
-		z2 = systbl.data[toID][colmap.z],
+		x1 = systbl.data[fromID][colmap.center][0],
+		x2 = systbl.data[toID][colmap.center][0],
+		y1 = systbl.data[fromID][colmap.center][1],
+		y2 = systbl.data[toID][colmap.center][1],
+		z1 = systbl.data[fromID][colmap.center][2],
+		z2 = systbl.data[toID][colmap.center][2],
 		dist;
 
 	dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
