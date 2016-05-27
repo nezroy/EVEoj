@@ -1,6 +1,6 @@
 {
   "name": "EVEoj",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "EVE Online JS library",
   "main": "src/EVEoj.js",
   "scripts": {
@@ -16,7 +16,11 @@
     "JavaScript",
     "library"
   ],
-  "author": "nezroy",
+  "author": "Xyjax",
+  "contributors": [{
+    "name": "nezroy",
+    "email": "nezroy@gmail.com"
+  }],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/xyjax/EVEoj/issues"
