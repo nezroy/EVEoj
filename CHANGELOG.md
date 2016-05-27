@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `celestials` and `statistics` load settings removed
 - systems no longer have luminosity, factionID, or sunTypeID (use mapStars raw data instead)
 
-## [Schema 201604290] - 2016-05-26
+## Schema 201604290 - 2016-05-26
 ### SDD schema changes with Citadel 1.1
 - space types renamed; X replaces J (Jove/other), J replaces W (wormhole); K is still K
 - mapSolarSystems position data changed to 3-tuples (0:x, 1:y, 2:z)
