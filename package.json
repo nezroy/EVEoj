@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xyjax/EVEoj.git"
+    "url": "https://github.com/nezroy/EVEoj.git"
   },
   "keywords": [
     "EVE",
@@ -16,16 +16,12 @@
     "JavaScript",
     "library"
   ],
-  "author": "Xyjax",
-  "contributors": [{
-    "name": "nezroy",
-    "email": "nezroy@gmail.com"
-  }],
+  "author": "nezroy <nezroy@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/xyjax/EVEoj/issues"
+    "url": "https://github.com/nezroy/EVEoj/issues"
   },
-  "homepage": "http://eve-oj.xyjax.com",
+  "homepage": "http://eve-oj.com",
   "dependencies": {
     "bluebird": "3.4.x",
     "node.extend": "1.1.x"
