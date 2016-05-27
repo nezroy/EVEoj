@@ -1,9 +1,9 @@
-exports.Const = require("./Const.js");
-exports.Utils = require("./Utils.js");
-exports.SDD = require("./SDD.js");
-exports.map = require("./map.js");
+exports.Const = require("./Const");
+exports.Utils = require("./Utils");
+exports.SDD = require("./SDD");
+exports.map = require("./map");
 if (exports.Utils.isBrowser) {
-	exports.IGB = require("./IGB.js");
+	exports.IGB = require("./IGB");
 }
 
 exports.V_MAJOR = 0;
