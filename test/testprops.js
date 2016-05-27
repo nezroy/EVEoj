@@ -3,10 +3,9 @@ var isBrowser = typeof(window) !== "undefined";
 var exp;
 
 if (isBrowser) {
-    exp = window.testprops = {};
-}
-else {
-    exp = exports;
+	exp = window.testprops = {};
+} else {
+	exp = exports;
 }
 
 exp.SDD_file_path = "D:\\projects\\xyjax\\static\\sdd\\201604290";

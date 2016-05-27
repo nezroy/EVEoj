@@ -5,10 +5,10 @@ var props;
 
 if (isBrowser) {
 	EVEoj = window.EVEoj;
-    props = window.testprops;
+	props = window.testprops;
 } else {
 	EVEoj = require("../../src/EVEoj");
-    props = require("../testprops");
+	props = require("../testprops");
 }
 
 describe("SDD.Create", function() {
