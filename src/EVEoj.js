@@ -7,6 +7,6 @@ if (exports.Utils.isBrowser) {
 }
 
 exports.V_MAJOR = 0;
-exports.V_MINOR = 2;
+exports.V_MINOR = 3;
 exports.V_PATCH = 0;
 exports.VERSION = exports.V_MAJOR + "." + exports.V_MINOR + "." + exports.V_PATCH;
