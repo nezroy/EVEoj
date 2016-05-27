@@ -23,7 +23,7 @@
   },
   "homepage": "http://eve-oj.xyjax.com",
   "dependencies": {
-    "bluebird": "3.3.x",
+    "bluebird": "3.4.x",
     "node.extend": "1.1.x"
   },
   "devDependencies": {

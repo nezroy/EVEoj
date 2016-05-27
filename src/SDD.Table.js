@@ -1,5 +1,6 @@
-var extend = require("node.extend");
-var Utils = require("./Utils.js");
+var extend = require("node.extend"),
+	Utils = require("./Utils"),
+	Promise = require("./Promise");
 
 var P = exports.P = {}; // public methods
 
@@ -142,7 +143,7 @@ function UnshiftIndexes(data, indexes) {
 	}
 }
 
-function SegLoadDone(tag, data, done, p, ctx, progress) {
+function SegLoadDone(res, rej, tag, data, done, ctx, progress) {
 	var i;
 	done.has++;
 	for (i = 0; i < this.segments.length; i++) {
@@ -169,28 +170,17 @@ function SegLoadDone(tag, data, done, p, ctx, progress) {
 		has: done.has,
 		needs: done.needs
 	});
-	if (done.has >= done.needs) p.resolve({
+	if (done.has >= done.needs) res({
 		context: ctx,
 		table: this
-	});
-}
-
-function SegLoadFail(tag, status, error, p, ctx) {
-	p.reject({
-		context: ctx,
-		table: this,
-		status: status,
-		error: error
 	});
 }
 
 // load data for this table; returns a deferred promise object as this is an async thing
 // if key is provided, loads ONLY the segment containing that key
 P.Load = function(opts) {
-	var p = Utils.deferred(),
-		self = this,
-		all_needs,
-		done,
+	var self = this,
+		all_needs = [],
 		nkey,
 		skey,
 		i,
@@ -199,96 +189,67 @@ P.Load = function(opts) {
 			context: null,
 			key: null,
 			progress: null
-		},
-		thenDone,
-		thenFail;
+		};
 	extend(o, opts);
 
+	// figure out which segments need loading
 	if (o.key === null) {
-		// load all segments
-		all_needs = [];
+		// no key specified; load all segments
 		for (i = 0; i < this.segments.length; i++) {
 			if (!this.segments[i].loaded) {
 				// this segment not yet loaded
 				all_needs.push(i);
 			}
 		}
-		done = {
-			needs: all_needs.length,
-			has: 0
-		};
-		if (all_needs.length > 0) {
-			thenDone = function(arg) {
-				SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.context, o.progress]);
-			};
-			thenFail = function(arg) {
-				SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.context]);
-			};
-			for (i = 0; i < all_needs.length; i++) {
-				segment = this.segments[all_needs[i]];
-				if (!segment.p) {
-					// this segment not pending load
-					segment.p = this.src.LoadTag(segment.tag);
-				}
-				segment.p.then(thenDone, thenFail);
-			}
-			return p.promise;
-		} else {
-			p.resolve({
-				context: o.context,
-				table: this
-			});
-			return p.promise;
-		}
 	} else {
 		// determine which segment the key is in
 		nkey = parseInt(o.key, 10);
 		if (isNaN(nkey)) {
-			p.reject({
-				context: o.context,
-				table: this,
-				status: "badkey",
-				error: "invalid key; not numeric"
-			});
-			return this.p.promise;
+			return Promise.reject(new Error("invalid key; not numeric"));
 		}
 		skey = nkey.toString(10);
 		segment = -1;
 		for (i = 0; i < this.segments.length; i++) {
 			if (nkey >= this.segments[i].min && (nkey <= this.segments[i].max || this.segments[i].max == -1)) {
 				// the key should be in this segment
-				segment = this.segments[i];
+				segment = i;
 				break;
 			}
 		}
 
-		if (segment === -1) return p.reject({
-			context: o.context,
-			table: this,
-			status: "badkey",
-			error: "invalid key; no segment contains it"
-		}).promise;
-		if (segment.loaded) return p.resolve({
+		if (segment === -1) {
+			return Promise.reject(new Error("invalid key; no segment contains it"));
+		}
+		if (!this.segments[segment].loaded) {
+			all_needs.push(segment);
+		}
+	}
+
+	if (all_needs.length < 1) {
+		// all required data already loaded
+		return Promise.resolve({
 			context: o.context,
 			table: this
-		}).promise;
+		});
+	}
 
-		if (segment.p === null) segment.p = this.src.LoadTag(segment.tag);
-		done = {
-			needs: 1,
+	return new Promise(function(res, rej) {
+		var done = {
+			needs: all_needs.length,
 			has: 0
 		};
-		segment.p.then(
-			function(arg) {
-				SegLoadDone.apply(self, [arg.tag, arg.data, done, p, o.context, o.progress]);
-			},
-			function(arg) {
-				SegLoadFail.apply(self, [arg.tag, arg.status, arg.error, p, o.context]);
+		var thenDone = function(arg) {
+			SegLoadDone.apply(self, [res, rej, arg.tag, arg.data, done, o.context, o.progress]);
+		};
+		for (i = 0; i < all_needs.length; i++) {
+			segment = self.segments[all_needs[i]];
+			if (!segment.p) {
+				// this segment not pending load
+				segment.p = self.src.LoadTag(segment.tag);
 			}
-		);
-
-		return p.promise;
-	}
+			segment.p.then(thenDone);
+		}
+	});
 };
 
 P.ColIter = function(colname) {

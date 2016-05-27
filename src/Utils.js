@@ -1,13 +1,10 @@
 /* global jQuery: false */
-/* global Promise: false */
-exports.isBrowser = typeof(window) !== "undefined";
+var Promise = require("./Promise");
 
-var req_browser_ignore = require;
-var BB;
+exports.isBrowser = typeof(window) !== "undefined";
 
 var F = function() {};
 
-// implementations from external stuff (mostly jQuery) that might theoretically change later
 exports.create = (typeof Object.create === "function") ?
 	Object.create :
 	function(o) {
@@ -17,19 +14,7 @@ exports.create = (typeof Object.create === "function") ?
 		if (typeof(o) !== "object") throw TypeError("Argument must be an object");
 		F.prototype = o;
 		return new F();
-};
-
-if (exports.isBrowser) {
-	// grab deferred from global, custom-built bluebird (inserted by uglify)
-	exports.deferred = Promise.defer;
-
-	// grab ajax from jQuery (implied dependency)
-	exports.ajax = jQuery.ajax;
-} else {
-	// bluebird required in a way that browserify will ignore (since using custom built for standalone)
-	BB = req_browser_ignore("bluebird");
-	exports.deferred = BB.defer;
-}
+	};
 
 exports.FormatNum = function(val, fixed) {
 	var stringy = [],
@@ -63,3 +48,12 @@ exports.FormatNum = function(val, fixed) {
 
 	return base;
 };
+
+var ajaxP = function(url, settings, cb) {
+	jQuery.ajax(url, settings).done(function(data, status, jqxhr) {
+		cb(null, data);
+	}).fail(function(jqxhr, status, error) {
+		cb(error, null);
+	});
+};
+exports.ajaxP = Promise.promisify(ajaxP);

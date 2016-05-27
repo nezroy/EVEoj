@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 		uglify: {
 			main: {
 				files: {
-					"./dist/<%= pkg.name %>.min.js": ["./libs/bluebird-3.3.5-core.js", "./dist/<%= pkg.name %>.js"]
+					"./dist/<%= pkg.name %>.min.js": ["./libs/bluebird-3.4.0.js", "./dist/<%= pkg.name %>.js"]
 				}
 			}
 		},
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 				"--local-to-remote-url-access": true,
 				specs: ["test/spec/*.js"],
 				helpers: ["test/testprops.js"],
-				vendor: ["libs/jquery-1.12.3.js", "libs/bluebird-3.3.5-core.js"]
+				vendor: ["libs/jquery-1.12.3.js", "libs/bluebird-3.4.0.js"]
 			}
 		}
 	});

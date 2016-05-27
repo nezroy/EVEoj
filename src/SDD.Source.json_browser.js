@@ -1,7 +1,8 @@
-var extend = require("node.extend");
-var Source = require("./SDD.Source.js");
-var Table = require("./SDD.Table.js");
-var Utils = require("./Utils.js");
+var extend = require("node.extend"),
+	Source = require("./SDD.Source"),
+	Table = require("./SDD.Table"),
+	Utils = require("./Utils"),
+	Promise = require("./Promise");
 
 var P = exports.P = Utils.create(Source.P); // public methods, inherit from base Source class
 
@@ -26,35 +27,15 @@ P.Config = function(config) {
 	extend(this.cfg, config);
 };
 
-function MetainfDone(data, status, jqxhr, p, ctx) {
+function MetainfDone(data, ctx) {
 	var tbl,
 		newt,
 		i;
 
-	if (!data) return p.reject({
-		context: ctx,
-		source: this,
-		status: "error",
-		error: "invalid data object"
-	});
-	if (!data.hasOwnProperty("formatID") || data.formatID != "1") return p.reject({
-		context: ctx,
-		source: this,
-		status: "error",
-		error: "unknown data format"
-	});
-	if (!data.hasOwnProperty("schema") || !data.hasOwnProperty("version")) return p.reject({
-		context: ctx,
-		source: this,
-		status: "error",
-		error: "data has no version information"
-	});
-	if (!data.hasOwnProperty("tables") || !data.hasOwnProperty("tables")) return p.reject({
-		context: ctx,
-		source: this,
-		status: "error",
-		error: "data has no table information"
-	});
+	if (!data) return Promise.reject(new Error("invalid data object"));
+	if (!data.hasOwnProperty("formatID") || data.formatID != "1") return Promise.reject(new Error("unknown data format"));
+	if (!data.hasOwnProperty("schema") || !data.hasOwnProperty("version")) return Promise.reject(new Error("data has no version information"));
+	if (!data.hasOwnProperty("tables") || !data.hasOwnProperty("tables")) return Promise.reject(new Error("data has no table information"));
 	this.version = data.version;
 	this.schema = data.schema;
 	if (data.hasOwnProperty("verdesc")) this.verdesc = data.verdesc;
@@ -80,80 +61,41 @@ function MetainfDone(data, status, jqxhr, p, ctx) {
 		}
 	}
 
-	p.resolve({
+	return Promise.resolve({
 		context: ctx,
 		source: this
 	});
 }
 
-function MetainfFail(jqxhr, status, error, p, ctx) {
-	p.reject({
-		context: ctx,
-		source: this,
-		status: status,
-		error: error
-	});
-}
-
 P.LoadMeta = function(ctx) {
-	var self = this,
-		p = Utils.deferred();
+	var self = this;
 
 	if (!this.cfg.hasOwnProperty("path") || typeof this.cfg.path != "string") {
-		return p.reject({
-			context: ctx,
-			source: this,
-			status: "error",
-			error: "path is required"
-		}).promise;
+		return Promise.reject(new Error("path is required"));
 	}
 	if (this.cfg.datatype != "json" && this.cfg.datatype != "jsonp") {
-		return p.reject({
-			context: ctx,
-			source: this,
-			status: "error",
-			error: "invalid datatype: " + this.cfg.datatype
-		}).promise;
+		return Promise.reject(new Error("invalid datatype: " + this.cfg.datatype));
 	}
 
-	Utils.ajax({
+	return Utils.ajaxP(this.cfg.path + "/metainf." + this.cfg.datatype, {
 		dataType: this.cfg.datatype,
 		cache: this.cfg.cache,
 		jsonp: false,
-		timeout: this.cfg.timeout,
-		jsonpCallback: "EVEoj_metainf_callback",
-		url: this.cfg.path + "/metainf." + this.cfg.datatype
-	}).then(
-		function(data, status, jqxhr) {
-			MetainfDone.apply(self, [data, status, jqxhr, p, ctx]);
-		},
-		function(jqxhr, status, error) {
-			MetainfFail.apply(self, [jqxhr, status, error, p, ctx]);
-		}
-	);
-
-	return p.promise;
+		timeout: this.cfg.timeout
+	}).then(function(data) {
+		return MetainfDone.apply(self, [data, ctx]);
+	});
 };
 
-function LoadFileDone(ctx, jsf, data) {
+function LoadFileDone(res, rej, ctx, jsf, data) {
 	if (!data || !data.hasOwnProperty("tables")) {
-		this.jsonfiles[jsf].p.reject({
-			context: ctx,
-			tag: jsf,
-			status: "error",
-			error: "invalid data object"
-		});
+		return rej(new Error("invalid data object"));
 	} else if (!data.hasOwnProperty("formatID") || data.formatID != "1") {
-		this.jsonfiles[jsf].p.reject({
-			context: ctx,
-			tag: jsf,
-			status: "error",
-			error: "unknown data format"
-		});
+		return rej(new Error("unknown data format"));
 	} else {
 		this.jsonfiles[jsf].loaded = true;
 		this.jsonfiles[jsf].data = data;
-		this.jsonfiles[jsf].p.resolve({
+		return res({
 			context: ctx,
 			tag: jsf,
 			data: data
@@ -161,40 +103,26 @@ function LoadFileDone(ctx, jsf, data) {
 	}
 }
 
-function LoadFileFail(ctx, jsf, status, error) {
-	this.jsonfiles[jsf].p.reject({
-		context: ctx,
-		tag: jsf,
-		status: status,
-		error: error
-	});
-}
 P.LoadTag = function(jsf, ctx) {
 	var self = this;
 	if (this.jsonfiles[jsf].loaded) {
-		return Utils.deferred().resolve({
+		return Promise.resolve({
 			tag: jsf,
 			data: this.jsonfiles[jsf].data
-		}).promise;
+		});
 	} else if (this.jsonfiles[jsf].p !== null) {
-		return this.jsonfiles[jsf].p.promise;
+		return this.jsonfiles[jsf].p;
 	} else {
-		this.jsonfiles[jsf].p = Utils.deferred();
-		Utils.ajax({
-			dataType: this.cfg.datatype,
-			cache: this.cfg.cache,
-			jsonp: false,
-			timeout: this.cfg.timeout,
-			jsonpCallback: "EVEoj_" + jsf + "_callback",
-			url: this.cfg.path + "/" + jsf + "." + this.cfg.datatype
-		}).then(
-			function(data) {
-				LoadFileDone.apply(self, [ctx, jsf, data]);
-			},
-			function(jqxhr, status, error) {
-				LoadFileFail.apply(self, [ctx, jsf, status, error]);
-			}
-		);
-		return this.jsonfiles[jsf].p.promise;
+		this.jsonfiles[jsf].p = new Promise(function(res, rej) {
+			Utils.ajaxP(self.cfg.path + "/" + jsf + "." + self.cfg.datatype, {
+				dataType: self.cfg.datatype,
+				cache: self.cfg.cache,
+				jsonp: false,
+				timeout: self.cfg.timeout
+			}).then(function(data) {
+				LoadFileDone.apply(self, [res, rej, ctx, jsf, data]);
+			});
+		});
+		return this.jsonfiles[jsf].p;
 	}
 };

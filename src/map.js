@@ -1,8 +1,9 @@
-var extend = require("node.extend");
-var Const = require("./Const.js");
-var Utils = require("./Utils.js");
-var System = require("./map.System.js");
-var SystemIter = require("./map.SystemIter.js");
+var extend = require("node.extend"),
+	Const = require("./Const"),
+	Utils = require("./Utils"),
+	System = require("./map.System"),
+	SystemIter = require("./map.SystemIter"),
+	Promise = require("./Promise");
 
 var P = exports.P = {}; // public methods for this class
 
@@ -42,7 +43,7 @@ exports.Create = function(src, type, config) {
 	return obj;
 };
 
-function LoadDone(tbl, ctx) {
+function LoadDone(res, rej, tbl, ctx) {
 	var has = 0,
 		needs = 0,
 		key;
@@ -58,20 +59,11 @@ function LoadDone(tbl, ctx) {
 
 	if (has >= needs) {
 		LoadInit.apply(this);
-		this.loadingP.resolve({
+		res({
 			context: ctx,
 			map: this
 		});
 	}
-}
-
-function LoadFail(tbl, ctx, status, error) {
-	this.loadingP.reject({
-		context: ctx,
-		map: this,
-		status: status,
-		error: error
-	});
 }
 
 function LoadProgress(arg, progress) {
@@ -102,22 +94,17 @@ function LoadProgress(arg, progress) {
 P.Load = function(opts) {
 	var self = this,
 		t = this.tables,
-		key,
-		thenDone,
-		thenFail,
-		progressFunc = null,
 		o = {
 			context: null,
 			progress: null
 		};
 	extend(o, opts);
 
-	if (this.loaded) return Utils.deferred().resolve({
+	if (this.loaded) return Promise.resolve({
 		context: o.context,
 		map: this
-	}).promise;
-	if (this.loadingP) return this.loadingP.promise;
-	this.loadingP = Utils.deferred();
+	});
+	if (this.loadingP) return this.loadingP;
 
 	// setup required and optional tables
 	t["map" + this.space + "Regions"] = false;
@@ -138,36 +125,35 @@ P.Load = function(opts) {
 	if (this.c.stars) t["map" + this.space + "Stars"] = false;
 	if (this.c.objects) t["map" + this.space + "SolarSystemObjects"] = false;
 
-	thenDone = function(arg) {
-		LoadDone.apply(self, [arg.table, arg.context]);
-	};
-	thenFail = function(arg) {
-		LoadFail.apply(self, [arg.table, arg.context, arg.status, arg.error]);
-	};
-	if (o.progress !== null) {
-		progressFunc = function(arg) {
-			LoadProgress.apply(self, [arg, o.progress]);
+	this.loadingP = new Promise(function(res, rej) {
+		var thenDone = function(arg) {
+			LoadDone.apply(self, [res, rej, arg.table, arg.context]);
 		};
-	}
-	for (key in t) {
-		if (!t.hasOwnProperty(key)) continue;
-		t[key] = {
-			tbl: this.src.GetTable(key),
-			done: false
-		};
-		if (!t[key].tbl) return this.loadingP.reject({
-			context: o.context,
-			map: self,
-			status: "error",
-			error: "source does not contain requested table: " + key
-		}).promise;
-		t[key].tbl.Load({
-			context: o.context,
-			progress: progressFunc
-		}).then(thenDone, thenFail);
-	}
+		var progressFunc = null;
+		var key;
+		if (o.progress !== null) {
+			progressFunc = function(arg) {
+				LoadProgress.apply(self, [arg, o.progress]);
+			};
+		}
+		for (key in t) {
+			if (!t.hasOwnProperty(key)) continue;
+			t[key] = {
+				tbl: self.src.GetTable(key),
+				done: false
+			};
+			if (!t[key].tbl) {
+				rej(new Error("source does not contain requested table: " + key));
+				return self.loadingP;
+			}
+			t[key].tbl.Load({
+				context: o.context,
+				progress: progressFunc
+			}).then(thenDone);
+		}
+	});
 
-	return this.loadingP.promise;
+	return this.loadingP;
 };
 
 function LoadInit() {
