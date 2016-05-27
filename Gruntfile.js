@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 				"--local-to-remote-url-access": true,
 				specs: ["test/spec/*.js"],
 				helpers: ["test/testprops.js"],
-				vendor: ["libs/jquery-1.12.3.js", "libs/bluebird-3.4.0.js"]
+				vendor: ["libs/jquery-1.12.4.js", "libs/bluebird-3.4.0.js"]
 			}
 		}
 	});
