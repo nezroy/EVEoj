@@ -14,7 +14,7 @@ if (isBrowser) {
 var SDD;
 var promise;
 
-var inv_types_size = 28948;
+var inv_types_size = 29310;
 
 var progress_counter;
 
@@ -37,7 +37,7 @@ describe("SDD.Table.LoadMeta", function() {
 		promise = SDD.LoadMeta();
 		expect(promise).not.toEqual(null);
 		promise.caught(function(ex) {
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 	it("has valid metainfo", function() {
@@ -71,7 +71,7 @@ describe("SDD.Table invTypes", function() {
 		expect(typeof(promise.then)).toEqual("function");
 		promise.caught(function(ex) {
 			console.log(JSON.stringify(ex, null, 1));
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 	it("has expected data", function() {
@@ -123,7 +123,7 @@ describe("SDD.Table.Load invTypesDesc", function() {
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise.caught(function(ex) {
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 	it("called progress tracker for partial load", function() {
@@ -192,7 +192,7 @@ describe("SDD.Table.Load invTypesDesc", function() {
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise.caught(function(ex) {
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 	it("called progress tracker for full load", function() {

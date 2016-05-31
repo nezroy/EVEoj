@@ -72,7 +72,7 @@ describe("map", function() {
 		promise = SDD.LoadMeta();
 		expect(promise).not.toEqual(null);
 		promise.caught(function(ex) {
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 
@@ -108,7 +108,7 @@ describe("map", function() {
 		expect(promise).not.toBeNull(null);
 		expect(typeof(promise.then)).toEqual("function");
 		promise.caught(function(ex) {
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 

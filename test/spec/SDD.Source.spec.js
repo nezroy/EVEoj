@@ -51,7 +51,7 @@ describe("SDD.Source.LoadMeta", function() {
 		expect(promise2).not.toEqual(null);
 		expect(typeof(promise2.then)).toEqual("function");
 		promise2.caught(function(ex) {
-			fail(ex.error);
+			fail(ex);
 		}).lastly(done);
 	});
 	it("has valid metainfo", function() {
