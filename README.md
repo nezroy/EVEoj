@@ -1,6 +1,6 @@
 EVEoj
 ====
-The EVEoj project provides a simple way to access EVE static data and formulas for mechanics in JS. It can be used as a Node.js module or directly in a web-browser (including full IGB support).
+The EVEoj project provides a simple way to access EVE static data and formulas for mechanics in JS. It can be used as a Node.js module or directly in a web browser (including full IGB support).
 
 See the [project website](https://eve-oj.com/) for additional details and API documentation.
 
@@ -28,15 +28,15 @@ Load jQuery and the EVEoj library into your web browser. If you are using the IG
 <script src="//cf.eve-oj.com/js/EVEoj-0.3.0.min.js"></script>
 ```
 
-In your custom JS, use the following code to point EVEoj at a hosted version of the static data.
+In your custom JS, use the following code to point EVEoj at a hosted version of the static data (where ver is the latest version of the CDN hosted data):
 
 ```javascript
-var SDD = EVEoj.SDD.Create("json", {path: "//cf.eve-oj.com/sdd/201604290"});
+var SDD = EVEoj.SDD.Create("json", {path: "//cf.eve-oj.com/sdd/" + ver});
 ```
 
 ## Simple typeID Example
 
-Once you have the library loaded and your SDD object created, your code is the same whether in Node.js or using a browser.
+Once you have the library loaded and your SDD object is created, your code is the same whether in Node.js or using a browser.
 
 As an example, the following snippet uses Underscore and EVEoj to print out the ID of the "Skill Injector" item. This example assumes that the Underscore library has been loaded into the `_` variable (using either a script tag in your HTML or via require in Node.js).
 
