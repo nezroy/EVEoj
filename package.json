@@ -1,7 +1,7 @@
 {
   "name": "EVEoj",
-  "version": "0.3.0",
-  "description": "EVE Online JS library",
+  "version": "0.3.1",
+  "description": "EVE Online JS library for JSON static data (SDE) and formulas",
   "main": "src/EVEoj.js",
   "scripts": {
     "test": "grunt"
@@ -13,6 +13,11 @@
   "keywords": [
     "EVE",
     "EVE Online",
+    "EVE SDE",
+    "EVE static data",
+    "EVE mechanics",
+    "EVE formulas",
+    "EVE api",
     "JavaScript",
     "library"
   ],
