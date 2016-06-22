@@ -55,7 +55,7 @@ exports.Create = function(tbl, ID) {
 
 	obj.ID = nID;
 	obj.name = sys[col.solarSystemName];
-	obj.regionID = sys[col.regionId];
+	obj.regionID = sys[col.regionID];
 	obj.constellationID = sys[col.constellationID];
 	obj.pos = {
 		x: sys[col.center][0],

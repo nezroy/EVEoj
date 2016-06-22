@@ -127,4 +127,18 @@ describe("map.System systems", function() {
 		expect(sys4.pos.z).toEqual(96773224779781040);
 	});
 
+	it("have expected region", function() {
+		expect(sys1.regionID).toEqual(10000043);
+		expect(sys2.regionID).toEqual(10000037);
+		expect(sys3.regionID).toEqual(10000067);
+		expect(sys4.regionID).toEqual(10000013);
+	});
+
+	it("have expected constellation", function() {
+		expect(sys1.constellationID).toEqual(20000322);
+		expect(sys2.constellationID).toEqual(20000447);
+		expect(sys3.constellationID).toEqual(20000771);
+		expect(sys4.constellationID).toEqual(20000155);
+	});
+
 });
