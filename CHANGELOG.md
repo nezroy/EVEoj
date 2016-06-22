@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2016-06-22
+### general changes
+- fix [regionID always null](https://github.com/nezroy/EVEoj/issues/4)
+
 ## [0.3.0] - 2016-05-26
 ### general changes
 - removed JSONP support
@@ -30,5 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - invTypes and invTypesDesc available columns have changed (see metainf for details)
 - staStationTypes and staStations available columns have changed (see metainf for details)
 
-[Unreleased]: https://github.com/nezroy/EVEoj/compare/HEAD...v0.3.0
-[0.3.0]: https://github.com/nezroy/EVEoj/compare/v0.3.0...v0.2.0
+[Unreleased]: https://github.com/nezroy/EVEoj/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/nezroy/EVEoj/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/nezroy/EVEoj/compare/v0.2.0...v0.3.0
