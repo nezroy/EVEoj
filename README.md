@@ -25,7 +25,7 @@ Load jQuery and the EVEoj library into your web browser. If you are using the IG
 
 ```html
 <script src="//cf.eve-oj.com/js/jquery-1.12.4.min.js"></script>
-<script src="//cf.eve-oj.com/js/EVEoj-0.3.0.min.js"></script>
+<script src="//cf.eve-oj.com/js/EVEoj-0.3.x.min.js"></script>
 ```
 
 In your custom JS, use the following code to point EVEoj at a hosted version of the static data (where ver is the latest version of the CDN hosted data):
