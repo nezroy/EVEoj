@@ -13,6 +13,6 @@ if (isBrowser) {
 
 describe("core", function() {
 	it("has expected version", function() {
-		expect(EVEoj.VERSION).toEqual("0.3.0");
+		expect(EVEoj.VERSION).toEqual("0.3.1");
 	});
 });
