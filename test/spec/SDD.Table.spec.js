@@ -14,7 +14,8 @@ if (isBrowser) {
 var SDD;
 var promise;
 
-var inv_types_size = 29310;
+var inv_types_size = 31056;
+var inv_seg_count = 7;
 
 var progress_counter;
 
@@ -114,7 +115,7 @@ describe("SDD.Table invTypes", function() {
 describe("SDD.Table.Load invTypesDesc", function() {
 	it("loads a valid segmented source asynchronously", function(done) {
 		var table = SDD.GetTable("invTypesDesc");
-		expect(table.segments.length).toEqual(6);
+		expect(table.segments.length).toEqual(inv_seg_count);
 		progress_counter = 0;
 		promise = table.Load({
 			key: 37,
@@ -184,7 +185,7 @@ describe("SDD.Table.Load invTypesDesc", function() {
 	});
 	it("loads remaining segmented data asynchronously", function(done) {
 		var table = SDD.GetTable("invTypesDesc");
-		expect(table.segments.length).toEqual(6);
+		expect(table.segments.length).toEqual(inv_seg_count);
 		progress_counter = 0;
 		promise = table.Load({
 			progress: progress_track
@@ -196,7 +197,7 @@ describe("SDD.Table.Load invTypesDesc", function() {
 		}).lastly(done);
 	});
 	it("called progress tracker for full load", function() {
-		expect(progress_counter).toEqual(5);
+		expect(progress_counter).toEqual(inv_seg_count - 1);
 	});
 	it("has expected full data", function() {
 		var table = SDD.GetTable("invTypesDesc");
